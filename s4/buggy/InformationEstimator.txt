@@ -1,0 +1,14 @@
+1c1
+< package s4.B000004; // Please modify to s4.Bnnnnnn, where nnnnnn is your student ID. 
+---
+> package s4.buggy; // Please modify to s4.Bnnnnnn, where nnnnnn is your student ID. 
+41c41
+<     // IQ: information quantity for a count, - log2(count/sizeof(space))
+---
+>     // IQ: information quantity for a count, -log2(count/sizeof(space))
+43d42
+< 	if(freq == 0) return Double.MAX_VALUE;
+60,62d58
+< 	if(myTarget == null) return (double) 0.0;
+< 	if(myTarget.length == 0) return (double) 0.0;
+< 	if(mySpace == null) return Double.MAX_VALUE;
