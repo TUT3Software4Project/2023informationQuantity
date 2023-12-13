@@ -49,7 +49,9 @@ public class TestCase {
 			testFrequencer(myObject, "ssss", "ss", 3);
 			testFrequencer(myObject, "apple", "le", 1);
 			testFrequencer(myObject, "apple", "apple", 1);
-			testFrequencer(myObject, "play", "player",0);
+			testFrequencer(myObject, "play", "player", 0);
+			testFrequencer(myObject, "", "abc", 0);
+			testFrequencer(myObject, "abc", "",-1);
 		} catch (Exception e) {
 			System.out.println("Exception occurred in Frequencer Object");
 			success = false;
