@@ -72,6 +72,15 @@ public class Frequencer implements FrequencerInterface {
             myObject.setSpace("Hi Ho Hi Ho".getBytes());
             myObject.setTarget("H".getBytes());
             freq = myObject.frequency();
+	    myObject = new Frequencer();
+	    freq = myObject.frequency();
+	    myObject = new Frequencer();
+	    myObject.setSpace("Hi".getBytes());
+	    myObject.setTarget("HiHo".getBytes());
+	    freq = myObject.frequency();
+	    myObject.setSpace("".getBytes());
+	    myObject.setTarget("".getBytes());
+	    freq = myObject.frequency();
         }
         catch(Exception e) {
             System.out.println("Exception occurred: STOP");

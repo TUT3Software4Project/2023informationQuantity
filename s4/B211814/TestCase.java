@@ -46,6 +46,30 @@ public class TestCase {
 	    assert freq == 4: "Hi Ho Hi Ho, H: " + freq;
 	    // Write your testCase here
 
+	    // Week1, Step13
+	    myObject = new Frequencer();
+	    myObject.setSpace("ABABAABA".getBytes());
+	    myObject.setTarget("ABA".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == 3: "ABABAABA, ABA: " + freq; // 一部が重複する文字列
+
+	    myObject = new Frequencer();
+	    myObject.setSpace("A".getBytes());
+	    myObject.setTarget("AB".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == 0: "A, AB: " + freq; // Targetの方がSpaceより長い  
+
+	    // Week1, Step14
+	    myObject = new Frequencer();
+	    myObject.setSpace("Hi Ho Hi Ho".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == -1: "TARGET is not set or TARGET's length is zero"; // Targetが初期化されていないときは-1を返す 
+
+	    myObject = new Frequencer();
+	    myObject.setTarget("H".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == 0: "SPACE is not set or Space's length is zero"; // Spaceが初期化されていないときは0を返す 
+
 
 	}
 	catch(Exception e) {
