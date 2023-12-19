@@ -1,6 +1,5 @@
 package s4.B233375; // Please modify to s4.Bnnnnnn, where nnnnnn is your student ID. 
 
-import java.lang.*;
 import s4.specification.*;
 
 /*
@@ -45,13 +44,27 @@ public class TestCase {
 			freq = myObject.frequency();
 			assert freq == 4 : "Hi Ho Hi Ho, H: " + freq;
 			// Write your testCase here
-			testFrequencer(myObject, "abc", "a", 1);
-			testFrequencer(myObject, "ssss", "ss", 3);
-			testFrequencer(myObject, "apple", "le", 1);
-			testFrequencer(myObject, "apple", "apple", 1);
-			testFrequencer(myObject, "play", "player", 0);
-			testFrequencer(myObject, "", "abc", 0);
-			testFrequencer(myObject, "abc", "",-1);
+			testFrequencer("abc", "a", 1);
+			testFrequencer("ssss", "ss", 3);
+			testFrequencer("apple", "le", 1);
+			testFrequencer("apple", "apple", 1);
+			testFrequencer("play", "player", 0);
+			testFrequencer("", "abc", 0);
+			testFrequencer("abc", "", -1);
+			// Test Case 5: Target not set
+			{
+				Frequencer noTarget = new Frequencer();
+				noTarget.setSpace("Hi Ho Hi Ho".getBytes());
+				freq = noTarget.frequency();
+				assert freq == -1 : "Test Case 5 Failed: Target not set";
+			}
+			{
+				// Test Case 6: Space not set
+				Frequencer noSpace = new Frequencer();
+				noSpace.setTarget("H".getBytes());
+				freq = noSpace.frequency();
+				assert freq == 0 : "Test Case 6 Failed: Space not set";
+			}
 		} catch (Exception e) {
 			System.out.println("Exception occurred in Frequencer Object");
 			success = false;
@@ -88,8 +101,9 @@ public class TestCase {
 		}
 	}
 
-	public static void testFrequencer(FrequencerInterface executer, String space, String target, int excepted)
+	public static void testFrequencer(String space, String target, int excepted)
 			throws Exception {
+		FrequencerInterface executer = new Frequencer();
 		executer.setSpace(space.getBytes());
 		executer.setTarget(target.getBytes());
 		int freq = executer.frequency();
