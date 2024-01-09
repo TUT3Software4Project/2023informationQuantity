@@ -38,16 +38,50 @@ public class TestCase {
 	    int freq;
 	    System.out.println("checking Frequencer");
 
-	    // This is smoke test
+	    //スモークテスト
 	    myObject = new Frequencer();
 	    myObject.setSpace("Hi Ho Hi Ho".getBytes());
 	    myObject.setTarget("H".getBytes());
 	    freq = myObject.frequency();
-	    assert freq == 4: "Hi Ho Hi Ho, H: " + freq;
-	    // Write your testCase here
+	    assert freq == 4 : "Hi Ho Hi Ho, H: " + freq;
 
+	    // 空のターゲットでテスト
+	    myObject.setTarget("".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == -1 : "空のターゲットは-1を返すべきですが、返り値は " + freq;
 
-	}
+ 	    // 空のスペースでテスト
+ 	    myObject.setTarget("H".getBytes());
+ 	    myObject.setSpace("".getBytes());
+ 	    freq = myObject.frequency();
+ 	    assert freq == 0 : "空のスペースは0を返すべきですが、返り値は " + freq;
+ 
+	    // ターゲットとスペースがどちらも空の場合のテスト
+	    myObject.setTarget("".getBytes());
+	    myObject.setSpace("".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == -1 : "空のターゲットとスペースは-1を返すべきですが、返り値は " + freq;
+
+	    // スペースに存在しないターゲットでのテスト
+	    myObject.setTarget("Z".getBytes());
+	    myObject.setSpace("Hi Ho Hi Ho".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == 0 : "スペースに存在しないターゲットは0を返すべきですが、返り値は " + freq;
+
+	    // subByteFrequency メソッドのテスト
+	    myObject.setTarget("Hi".getBytes());
+	    freq = myObject.subByteFrequency(0, 1);
+	    assert freq == 2 : "'Hi Ho Hi Ho' の中で 'Hi' の subByteFrequency は start=0 かつ end=1 の場合に2を返すべきですが、返り値は " + freq;
+	　　
+	    //例外発生のテスト
+	　　myObject.setSpace("Hi Ho Hi Ho".getBytes());
+	　　myObject.setTarget("Hello".getBytes());
+	    freq = myObject.frequency();
+	    assert false : "Target length is greater than space length, but no exception was thrown";
+	} catch (ArrayIndexOutOfBoundsException e) {
+    	// This is the expected behavior, the test has passed
+    		System.out.println("Exception occurred in Frequencer Object Because target length is greater than space length");
+	} 
 	catch(Exception e) {
 	    System.out.println("Exception occurred in Frequencer Object");
 	    success = false;

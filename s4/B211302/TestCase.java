@@ -44,9 +44,36 @@ public class TestCase {
 	    myObject.setTarget("H".getBytes());
 	    freq = myObject.frequency();
 	    assert freq == 4: "Hi Ho Hi Ho, H: " + freq;
-	    // Write your testCase here
 
+	　　// Test 1: When both target and space are set
+	　　myObject.setSpace("Hi Ho Hi Ho".getBytes());
+	　　myObject.setTarget("H".getBytes());
+	　　freq = myObject.frequency();
+	　　assert freq == 4 : "Test 1 Failed: Hi Ho Hi Ho, H: " + freq;
 
+	　　// Test 2: When target is not set
+　	　　myObject.setSpace("Hi Ho Hi Ho".getBytes());
+	　　myObject.setTarget("".getBytes());
+	　　freq = myObject.frequency();
+	　　assert freq == -1 : "Test 2 Failed: Target is not set";
+
+	　　// Test 3: When space is not set
+	　　myObject.setSpace("".getBytes());
+	　　myObject.setTarget("H".getBytes());
+	　　freq = myObject.frequency();
+	　　assert freq == 0 : "Test 3 Failed: Space is not set";
+
+	　　// Test 4: When both target and space are not set
+	　　myObject.setSpace("".getBytes());
+	　　myObject.setTarget("".getBytes());
+	　　freq = myObject.frequency();
+	　　assert freq == -1 : "Test 4 Failed: Target and Space are not set";
+
+	　　// Test 5
+	　　myObject.setSpace("Hi Ho Hi Ho Hi Ho".getBytes());
+	　　myObject.setTarget("Ho Hi".getBytes());
+	　　freq = myObject.frequency();
+	　　assert freq == 2 : "Test 5 Failed: Hi Ho Hi Ho Hi Ho, H: " + freq;;
 	}
 	catch(Exception e) {
 	    System.out.println("Exception occurred in Frequencer Object");

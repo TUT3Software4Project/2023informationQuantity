@@ -3,7 +3,7 @@ import java.lang.*;
 
 public class Hello {
     public static void main(String[] args) {
-        System.out.println("hello..(It's me Outdam)");
+        System.out.println("hello..(学籍番号-20231219)");
     }
 }
 

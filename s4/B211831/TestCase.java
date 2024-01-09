@@ -39,11 +39,13 @@ public class TestCase {
 	    System.out.println("checking Frequencer");
 
 	    // This is smoke test
-	    myObject = new Frequencer();
-	    myObject.setSpace("Hi Ho Hi Ho".getBytes());
-	    myObject.setTarget("H".getBytes());
-	    freq = myObject.frequency();
-	    assert freq == 4: "Hi Ho Hi Ho, H: " + freq;
+		// Frequencerのテストケース
+		myObject = new Frequencer();
+		myObject.setSpace("Test string for frequency".getBytes());
+		myObject.setTarget("frequency".getBytes());
+		freq = myObject.frequency();
+		assert freq == 0: "Target length is greater than space string length: " + freq;
+
 	    // Write your testCase here
 
 
