@@ -1,6 +1,8 @@
 package s4.B233375; // Please modify to s4.Bnnnnnn, where nnnnnn is your student ID. 
 
 import java.lang.*;
+import java.util.Objects;
+
 import s4.specification.*;
 
 /*
@@ -45,22 +47,47 @@ public class Frequencer implements FrequencerInterface {
 
     @Override
     public int frequency() {
-        int targetLength = myTarget.length;
-        int spaceLength = mySpace.length;
+        //targetが設定されているか確認する
+        if (Objects.isNull(myTarget)) {
+            return -1;
+
+        }
+        //spaceが設定されているか確認する
+        if (Objects.isNull(mySpace)) {
+            return 0;
+        }
+        int targetLength = myTarget.length;// not set の場合は0になる?->null pointerになった
+        int spaceLength = mySpace.length;// not set の場合は0になる?-> null pointer になった
+        // TARGETの長さが0でないかを確認する
+        if (targetLength == 0) {
+            return -1;
+        }
+        // space の長さが0出ないかを確認する
+        if (spaceLength == 0) {
+            return 0;
+        }
         int count = 0;
         if (debugMode) {
             showVariables();
         }
-        for (int start = 0; start < spaceLength; start++) { // Is it OK?
-            boolean abort = false;
+        // Otherwise, get the frequency of TAGET in SPACE
+
+        // space abcd(4) -> 0,1,2 -> i=0; i<= space length - target length
+        // target ab(2)
+
+        // space ab(2) -> 0 : i=0 : i< space length - target length
+        // target ab(2)
+        for (int start = 0; start <= spaceLength - targetLength; start++) { // Is it OK?
+                                                                            // //開始地点(0文字目からtargetの最後がspaceの最後に一致するまで)
+            boolean abort = false;// 先頭からみて文字が一致していているか
             for (int i = 0; i < targetLength; i++) {
-                if (myTarget[i] != mySpace[start + i]) {
-                    abort = true;
+                if (myTarget[i] != mySpace[start + i]) {// 文字が一致していなかったら
+                    abort = true;// 中断+先頭を次に移す
                     break;
                 }
             }
-            if (abort == false) {
-                count++;
+            if (abort == false) {// 最後まで一致したら
+                count++;// カウントを増やす
             }
         }
         if (debugMode) {

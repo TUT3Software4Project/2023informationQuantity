@@ -51,6 +51,7 @@ public class TestCase {
 			testFrequencer("play", "player", 0);
 			testFrequencer("", "abc", 0);
 			testFrequencer("abc", "", -1);
+			testFrequencer("aaa", "a", 3);
 			// Test Case 5: Target not set
 			{
 				Frequencer noTarget = new Frequencer();
@@ -66,6 +67,7 @@ public class TestCase {
 				assert freq == 0 : "Test Case 6 Failed: Space not set";
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Exception occurred in Frequencer Object");
 			success = false;
 		}
@@ -92,7 +94,32 @@ public class TestCase {
 			value = myObject.estimation();
 			assert (value > 3.9999) && (4.0001 > value)
 					: "IQ for 00 in 3210321001230123 should be 3.0. But it returns " + value;
+			// spaceが未設定時
+			{
+				InformationEstimatorInterface noSpace = new InformationEstimator();
+				//myObject.setSpace("3210321001230123".getBytes());
+				noSpace.setTarget("0".getBytes());
+				double iq = noSpace.estimation();
+				assert (iq == Double.MAX_VALUE) : "Test Case Failed: Space not set";
+			}
+			//space長が0
+				{
+			InformationEstimatorInterface zeroSpace = new InformationEstimator();
+			zeroSpace.setSpace("".getBytes());
+			zeroSpace.setTarget("0".getBytes());
+			double iq = zeroSpace.estimation();
+			}
+			// targetが未設定時
+			{
+			InformationEstimatorInterface noTarget = new InformationEstimator();
+			noTarget.setSpace("3210321001230123".getBytes());
+			double iq = noTarget.estimation();
+			assert (iq > -0.0001) && ( 0.0001> iq): "Test Case Failed: target not set";
+			}
+			testEstimation("a", "", 0.0);//target length ==0
+			testEstimation("abc", "def", Double.MAX_VALUE);
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Exception occurred in InformationEstimator Object");
 			success = false;
 		}
@@ -109,5 +136,15 @@ public class TestCase {
 		int freq = executer.frequency();
 		assert freq == excepted : space + ", " + target + ": " + freq;
 
+	}
+
+	public static void testEstimation(String space, String target, double excepted)
+			throws Exception {
+		double esp = 0.0001;//許容誤差
+		InformationEstimatorInterface estimator = new InformationEstimator();
+		estimator.setSpace(space.getBytes());
+		estimator.setTarget(target.getBytes());
+		double iq= estimator.estimation();
+		assert (excepted - esp <= iq && iq <= excepted + esp )		: "IQ for "+target+" in "+space+" should be "+ excepted+". But it returns " + iq;
 	}
 }
