@@ -66,6 +66,7 @@ public class TestCase {
 				assert freq == 0 : "Test Case 6 Failed: Space not set";
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Exception occurred in Frequencer Object");
 			success = false;
 		}
@@ -93,6 +94,7 @@ public class TestCase {
 			assert (value > 3.9999) && (4.0001 > value)
 					: "IQ for 00 in 3210321001230123 should be 3.0. But it returns " + value;
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Exception occurred in InformationEstimator Object");
 			success = false;
 		}
