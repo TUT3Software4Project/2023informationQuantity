@@ -12,6 +12,7 @@ interface FrequencerInterface {  // This interface provides the design for frequ
     int frequency(); // It return -1, when TARGET is not set or TARGET's length is zero
                      // Otherwise, it return 0, when SPACE is not set or Space's length is zero
                      // Otherwise, get the frequency of TAGET in SPACE
+                     //e.g. myTarget : aaaa , mySpace : aa -> frequency :3 ([0,1],[1,2],[2,3]の3つ)
     int subByteFrequency(int start, int end);
     // get the frequency of subByte of taget, i.e. target[start], taget[start+1], ... , target[end-1].
     // For the incorrect value of START or END, the behavior is undefined.
@@ -48,12 +49,12 @@ public class Frequencer implements FrequencerInterface {
     @Override
     public int frequency() {
         //targetが設定されているか確認する
-        if (Objects.isNull(myTarget)) {
+        if  (Objects.isNull(myTarget)) {
             return -1;
 
         }
         //spaceが設定されているか確認する
-        if (Objects.isNull(mySpace)) {
+        if  (Objects.isNull(mySpace)) {
             return 0;
         }
         int targetLength = myTarget.length;// not set の場合は0になる?->null pointerになった
