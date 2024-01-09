@@ -51,6 +51,7 @@ public class TestCase {
 			testFrequencer("play", "player", 0);
 			testFrequencer("", "abc", 0);
 			testFrequencer("abc", "", -1);
+			testFrequencer("aaa", "a", 3);
 			// Test Case 5: Target not set
 			{
 				Frequencer noTarget = new Frequencer();
