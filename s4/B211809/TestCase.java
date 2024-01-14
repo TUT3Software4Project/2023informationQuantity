@@ -45,18 +45,31 @@ public class TestCase {
 	    freq = myObject.frequency();
 	    assert freq == 4: "Hi Ho Hi Ho, H: " + freq;
 	    // Write your testCase here
-	// Test Case: Target length greater than remaining space length
-	myObject = new Frequencer();
+
+	System.out.printf("check1");
+	myObject.setSpace("Hi Ho Hi Ho".getBytes());
+	myObject.setTarget("".getBytes()); // Target length is greater than space length
+	freq = myObject.frequency();
+	assert freq == -1: "target is not null";
+	
+	System.out.printf("check2");
+	myObject.setSpace("".getBytes());
+	myObject.setTarget("Hi Ho Hi Ho".getBytes()); // Target length is greater than space length
+	freq = myObject.frequency();
+	assert freq == 0: "space is not null";
+
+	System.out.printf("check3");
+	myObject.setSpace("Hi Ho Hi Ho".getBytes());
+	myObject.setTarget("Hi Ho".getBytes()); // Target length is greater than space length
+	freq = myObject.frequency();
+	assert freq == 2: "something wrong";
+
+	System.out.printf("check4");
+	 
 	myObject.setSpace("Hi Ho Hi Ho".getBytes());
 	myObject.setTarget("Hi Ho Hi Ho".getBytes()); // Target length is greater than space length
-	try {
-    		freq = myObject.frequency();
-    		// If the exception is not thrown, the test fails
-    		assert false : "Expected ArrayIndexOutOfBoundsException, but the frequency is: " + freq;
-	} catch (ArrayIndexOutOfBoundsException e) {
-    	// If the exception is caught, the test passes
-    		assert true;
-	}
+	freq = myObject.subByteFrequency(0, 5);
+	assert freq == 2: "something wrong";
 
 
 	}

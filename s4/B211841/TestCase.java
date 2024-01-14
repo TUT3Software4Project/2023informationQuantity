@@ -45,24 +45,30 @@ public class TestCase {
 	    freq = myObject.frequency();
 	    assert freq == 4: "Hi Ho Hi Ho, H: " + freq;
 
-		
-		myObject = new Frequencer();
 		myObject.setSpace("Hiii".getBytes()); // space: 4 bytes
 		myObject.setTarget("Hiiii".getBytes()); // target: 5 bytes
-		try{
-			freq = myObject.frequency();
-		}catch(ArrayIndexOutOfBoundsException e){
-			System.out.println("ArrayIndexOutOfBoundsException Occured");
-		}
-		
+		freq = myObject.frequency();
+		assert freq == 0: "Hiii, Hiiii: " + freq;
+
+
+		myObject.setSpace("".getBytes());
+		myObject.setTarget("Hiiii".getBytes());
+		freq = myObject.frequency();
+		assert freq == 0 : "NotSet,Hiiii" + freq;
+
+		myObject.setSpace("Hiii".getBytes());
+		myObject.setTarget("".getBytes());
+		freq = myObject.frequency();
+		assert freq == -1 : "Hiii, NotSet" + freq;
+
+		myObject.setSpace("AAAA".getBytes());
+		myObject.setTarget("AA".getBytes());
+		freq = myObject.frequency();
+		assert freq == 3: "AAAA,AA: " + freq;
 
 
 // //Week1-STEP13
 //             myObject = new Frequencer();
-//             myObject.setSpace("HiHiHiH".getBytes());
-//             myObject.setTarget("HiH".getBytes());
-//             freq = myObject.frequency();
-//             assert freq == 3: "HiH: " + freq;
 //             myObject = new Frequencer();
 //             myObject.setSpace("Hi".getBytes());
 //             myObject.setTarget("HiH".getBytes());

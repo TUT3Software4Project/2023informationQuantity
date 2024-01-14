@@ -40,16 +40,22 @@ public class Frequencer implements FrequencerInterface {
 
     @Override
     public int frequency() {
-        int targetLength = myTarget.length;
-        int spaceLength = mySpace.length;
+	int targetLength = myTarget.length;
+	int spaceLength = mySpace.length;
+	if(myTarget.length == 0){//ターゲットが不正な時にreturn -1
+		return -1;
+	}
+	if(mySpace.length == 0){//スペースが不正な時にreturn 0
+		return 0;
+	}
         int count = 0;
 	if(debugMode) { showVariables(); }
-        for(int start = 0; start<spaceLength; start++) { // Is it OK?
+        for(int start = 0; start<(spaceLength-(targetLength-1)); start++) { //spaceの開始地点を進める
             boolean abort = false;
-            for(int i = 0; i<targetLength; i++) {
-                if(myTarget[i] != mySpace[start+i]) { abort = true; break; }
+            for(int i = 0; i<targetLength; i++) {//開始地点からターゲットと一致しているか一文字ずつ調べる。
+                if(myTarget[i] != mySpace[start+i]) { abort = true; break; }//一文字でも一致していなければbreak
             }
-            if(abort == false) { count++; }
+            if(abort == false) { count++; }//全文字一致だった時にカウント
         }
 	if(debugMode) { System.out.printf("%10d\n", count); }
         return count;
@@ -59,7 +65,34 @@ public class Frequencer implements FrequencerInterface {
     @Override
     public int subByteFrequency(int start, int length) {
         // Not yet implemented, but it should be defined as specified.
-        return -1;
+	if(start>myTarget.length-1 || length>myTarget.length-1 || start>length){//正しくない因数の場合はreturn -1
+        	return -1;
+	}
+	List<byte> list = new ArrayList<byte>();//リストを作る
+	for(int i=start;i<length;i++){//作ったリストに切り出すべきところを入れていく
+		 list.add(myTarget[i]);
+	}
+	byte[] subTarget = list.toArray(new byte[list.size()]);//リストを配列に変える
+	//以下は大体frequency()と同じ
+	int subtargetLength = subTarget.length;
+	int spaceLength = mySpace.length;
+	if(subTarget.length == 0){
+		return -1;
+	}
+	if(mySpace.length == 0){
+		return 0;
+	}
+        int count = 0;
+	if(debugMode) { showVariables(); }
+        for(start = 0; start<(spaceLength-(subtargetLength-1)); start++) { // Is it OK? => OK!
+            boolean abort = false;
+            for(int i = 0; i<subtargetLength; i++) {
+                if(subTarget[i] != mySpace[start+i]) { abort = true; break; }
+            }
+            if(abort == false) { count++; }
+        }
+	if(debugMode) { System.out.printf("%10d\n", count); }
+        return count;
     }
 
     public static void main(String[] args) {
@@ -69,8 +102,8 @@ public class Frequencer implements FrequencerInterface {
 	debugMode = true;
         try {
             myObject = new Frequencer();
-            myObject.setSpace("Hi Ho Hi Ho".getBytes());
-            myObject.setTarget("H".getBytes());
+            myObject.setSpace("Hi Ho Hi Ho".getBytes());//探される文をセット
+            myObject.setTarget("H".getBytes());//探す単語をセット
             freq = myObject.frequency();
         }
         catch(Exception e) {

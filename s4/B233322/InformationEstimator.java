@@ -56,6 +56,9 @@ public class InformationEstimator implements InformationEstimatorInterface {
 
     @Override
     public double estimation(){
+	if (this.myTarget == null || this.myTarget.length == 0) { return 0.0; }
+	if (this.mySpace == null || this.mySpace.length == 0) { return Double.MAX_VALUE; }
+	
         boolean [] partition = new boolean[myTarget.length+1];
         int np = 1<<(myTarget.length-1);
         double value = Double.MAX_VALUE; // value = mininimum of each "value1".
@@ -98,7 +101,7 @@ public class InformationEstimator implements InformationEstimatorInterface {
             if(value1 < value) value = value1;
         }
 	if(debugMode) { System.out.printf("%10.5f\n", value); }
-        return value;
+        return (value == Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : value;
     }
 
     public static void main(String[] args) {

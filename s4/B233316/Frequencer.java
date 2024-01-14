@@ -40,11 +40,17 @@ public class Frequencer implements FrequencerInterface {
 
     @Override
     public int frequency() {
+        if (myTarget == null || myTarget.length == 0) {
+            return -1;
+        }
+        if (mySpace == null) {
+            return 0;
+        }
         int targetLength = myTarget.length;
         int spaceLength = mySpace.length;
         int count = 0;
         if(debugMode) { showVariables(); }
-        for(int start = 0; start<spaceLength; start++) { // Is it OK?
+        for(int start = 0; start<spaceLength - targetLength + 1; start++) { // Is it OK?
             boolean abort = false;
             for(int i = 0; i<targetLength; i++) {
                 if(myTarget[i] != mySpace[start+i]) { abort = true; break; }

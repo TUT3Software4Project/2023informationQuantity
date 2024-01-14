@@ -24,10 +24,10 @@ public class InformationEstimator implements InformationEstimatorInterface {
     FrequencerInterface myFrequencer;  // Object for counting frequency
 
     private void showVariables() {
-	for(int i=0; i< mySpace.length; i++) { System.out.write(mySpace[i]); }
-	System.out.write(' ');
-	for(int i=0; i< myTarget.length; i++) { System.out.write(myTarget[i]); }
-	System.out.write(' ');
+        for(int i=0; i< mySpace.length; i++) { System.out.write(mySpace[i]); }
+        System.out.write(' ');
+        for(int i=0; i< myTarget.length; i++) { System.out.write(myTarget[i]); }
+        System.out.write(' ');
     }
 
     byte[] subBytes(byte[] x, int start, int end) {
@@ -56,10 +56,16 @@ public class InformationEstimator implements InformationEstimatorInterface {
 
     @Override
     public double estimation(){
+        if (myTarget == null || myTarget.length == 0) {
+            return 0;
+        }
+        if (mySpace == null || mySpace.length == 0) {
+            return Double.MAX_VALUE;
+        }
         boolean [] partition = new boolean[myTarget.length+1];
         int np = 1<<(myTarget.length-1);
         double value = Double.MAX_VALUE; // value = mininimum of each "value1".
-	if(debugMode) { showVariables(); }
+	    if(debugMode) { showVariables(); }
         if(debugMode) { System.out.printf("np=%d length=%d ", np, +myTarget.length); }
 
         for(int p=0; p<np; p++) { // There are 2^(n-1) kinds of partitions.
@@ -87,9 +93,14 @@ public class InformationEstimator implements InformationEstimatorInterface {
                 }
                 // System.out.print("("+start+","+end+")");
                 myFrequencer.setTarget(subBytes(myTarget, start, end));
-                value1 = value1 + f(myFrequencer.frequency());
-		// it should  -->   value1 = value1 + f(myFrequencer.subByteFrequency(start, end)
-		// note that subByteFrequency is not work for B233316 version.
+                int freq = myFrequencer.frequency();
+                if (freq == 0) {
+                    value1 = Double.MAX_VALUE;
+                } else {
+                    value1 = value1 + f(freq);
+                }
+                // it should  -->   value1 = value1 + f(myFrequencer.subByteFrequency(start, end)
+                // note that subByteFrequency is not work for B233316 version.
                 start = end;
             }
             // System.out.println(" "+ value1);
@@ -97,14 +108,14 @@ public class InformationEstimator implements InformationEstimatorInterface {
             // Get the minimal value in "value"
             if(value1 < value) value = value1;
         }
-	if(debugMode) { System.out.printf("%10.5f\n", value); }
+	    if(debugMode) { System.out.printf("%10.5f\n", value); }
         return value;
     }
 
     public static void main(String[] args) {
         InformationEstimator myObject;
         double value;
-	debugMode = true;
+	    debugMode = true;
         myObject = new InformationEstimator();
         myObject.setSpace("3210321001230123".getBytes());
         myObject.setTarget("0".getBytes());
