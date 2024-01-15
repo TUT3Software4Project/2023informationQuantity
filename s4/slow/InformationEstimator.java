@@ -44,11 +44,11 @@ public class InformationEstimator implements InformationEstimatorInterface{
     }
 
     public double estimation(){
+	if(targetReady == false) return (double) 0.0;
+	if(spaceReady == false) return Double.MAX_VALUE;
 	boolean [] partition = new boolean[myTarget.length+1];
 	int np;
 
-	if(targetReady == false) return (double) 0.0;
-	if(spaceReady == false) return Double.MAX_VALUE;
 
 	np = 1<<(myTarget.length-1);
 	// System.out.println("np="+np+" length="+myTarget.length);
