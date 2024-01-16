@@ -8,7 +8,7 @@ interface FrequencerInterface {  // This interface provides the design for frequ
     void setSpace(byte[] space);  // set the data to be searched target from.
     int frequency(); // It return -1, when TARGET is not set or TARGET's length is zero
                      // Otherwise, it return 0, when SPACE is not set or Space's length is zero
-                     // Otherwise, get the frequency of TAGET in SPACE
+                     // Otherwise, get the frequency of TARGET in SPACE
     int subByteFrequency(int start, int end);
     // get the frequency of subByte of taget, i.e. target[start], taget[start+1], ... , target[end-1].
     // For the incorrect value of START or END, the behavior is undefined.
@@ -47,7 +47,7 @@ public class Frequencer implements FrequencerInterface {
         for(int start = 0; start<spaceLength; start++) { // Is it OK?
             boolean abort = false;
             for(int i = 0; i<targetLength; i++) {
-                if(myTarget[i] != mySpace[start+i]) { abort = true; break; }
+                if(myTarget[i] != mySpace[start+i]) { abort = true; break; } // mySpaceの要素数が[start+i]を超えるとエラー
             }
             if(abort == false) { count++; }
         }
@@ -70,7 +70,7 @@ public class Frequencer implements FrequencerInterface {
         try {
             myObject = new Frequencer();
             myObject.setSpace("Hi Ho Hi Ho".getBytes());
-            myObject.setTarget("H".getBytes());
+            myObject.setTarget("Hoo".getBytes());
             freq = myObject.frequency();
         }
         catch(Exception e) {

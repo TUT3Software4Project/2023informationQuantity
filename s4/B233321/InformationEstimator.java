@@ -42,7 +42,7 @@ public class InformationEstimator implements InformationEstimatorInterface {
     double f(int freq) {
         return  - Math.log10((double) freq / (double) mySpace.length)/ Math.log10((double) 2.0);
     }
-
+	
     @Override
     public void setTarget(byte[] target) {
         myTarget = target;

@@ -45,8 +45,43 @@ public class TestCase {
 	    freq = myObject.frequency();
 	    assert freq == 4: "Hi Ho Hi Ho, H: " + freq;
 	    // Write your testCase here
-
-
+	　　// テストケース1: 文字列内の単一の文字の頻度を確認する
+	　　myObject.setSpace("abcdeabcde".getBytes());
+	　　myObject.setTarget("a".getBytes());
+	　　freq = myObject.frequency();
+	　　assert freq == 2 : "abcdeabcde, a: " + freq;
+	
+　　　　	　　// テストケース2: 文字列内の部分文字列の頻度を確認する
+	　　myObject.setSpace("HelloHelloHello".getBytes());
+	　　myObject.setTarget("Hello".getBytes());
+	　　freq = myObject.frequency();
+	　　assert freq == 3 : "HelloHelloHello, Hello: " + freq;
+	
+	　　// テストケース3: ターゲットが設定されていない場合の頻度を確認する
+	　　myObject.setSpace("12345".getBytes());
+	　　freq = myObject.frequency();
+	　　assert freq == -1 : "Target not set: " + freq;
+	
+	　　// テストケース4: スペースが設定されていない場合の頻度を確認する
+	　　myObject.setTarget("1".getBytes());
+	　　freq = myObject.frequency();
+	　　assert freq == 0 : "Space not set: " + freq;
+	
+	　　// テストケース5: ターゲットとスペースの両方が設定されていない場合の頻度を確認する
+	　　freq = myObject.frequency();
+	　　assert freq == -1 : "Both target and space not set: " + freq;
+	
+	　　// テストケース6: ターゲットの長さがゼロの場合の頻度を確認する
+	　　myObject.setSpace("abc".getBytes());
+	　　myObject.setTarget("".getBytes());
+	　　freq = myObject.frequency();
+	　　assert freq == -1 : "Target's length is zero: " + freq;
+	
+	　　// テストケース7: スペースの長さがゼロの場合の頻度を確認する
+	　　myObject.setTarget("a".getBytes());
+	　　myObject.setSpace("".getBytes());
+	　　freq = myObject.frequency();
+	　　assert freq == 0 : "Space's length is zero: " + freq;
 	}
 	catch(Exception e) {
 	    System.out.println("Exception occurred in Frequencer Object");

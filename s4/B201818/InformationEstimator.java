@@ -40,6 +40,9 @@ public class InformationEstimator implements InformationEstimatorInterface {
 
     // f: information quantity for a count, -log2(count/sizeof(space))
     double f(int freq) {
+	if(freq ==0){
+		return Double.MAX_VALUE;
+	}
         return  - Math.log10((double) freq / (double) mySpace.length)/ Math.log10((double) 2.0);
     }
 
@@ -56,6 +59,12 @@ public class InformationEstimator implements InformationEstimatorInterface {
 
     @Override
     public double estimation(){
+	if(myTarget.length == 0){
+		return 0.0;
+	}
+	if(mySpace.length == 0){
+		return Double.MAX_VALUE;
+	}
         boolean [] partition = new boolean[myTarget.length+1];
         int np = 1<<(myTarget.length-1);
         double value = Double.MAX_VALUE; // value = mininimum of each "value1".

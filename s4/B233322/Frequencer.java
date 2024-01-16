@@ -1,5 +1,6 @@
 package s4.B233322; // Please modify to s4.Bnnnnnn, where nnnnnn is your student ID. 
 import java.lang.*;
+import java.util.Arrays;
 import s4.specification.*;
 
 /*
@@ -40,11 +41,17 @@ public class Frequencer implements FrequencerInterface {
 
     @Override
     public int frequency() {
+	if (this.myTarget == null) { return -1; }
+	if (this.mySpace == null) { return 0; }
+		
         int targetLength = myTarget.length;
+	if (targetLength == 0) { return -1; }
         int spaceLength = mySpace.length;
+	if (spaceLength == 0) { return 0; }
+	
         int count = 0;
 	if(debugMode) { showVariables(); }
-        for(int start = 0; start<spaceLength; start++) { // Is it OK?
+        for(int start = 0; start + targetLength - 1 < spaceLength; start++) { // Is it OK?
             boolean abort = false;
             for(int i = 0; i<targetLength; i++) {
                 if(myTarget[i] != mySpace[start+i]) { abort = true; break; }
@@ -55,11 +62,12 @@ public class Frequencer implements FrequencerInterface {
         return count;
     }
 
-    // I know that here is a potential problem in the declaration.
     @Override
-    public int subByteFrequency(int start, int length) {
-        // Not yet implemented, but it should be defined as specified.
-        return -1;
+    public int subByteFrequency(int start, int end) {
+	Frequencer freq = new Frequencer();
+	freq.setSpace(this.mySpace);
+	freq.setTarget(Arrays.copyOfRange(this.myTarget, start, end));
+	return freq.frequency();
     }
 
     public static void main(String[] args) {

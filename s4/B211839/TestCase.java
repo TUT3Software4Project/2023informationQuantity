@@ -45,8 +45,22 @@ public class TestCase {
 	    freq = myObject.frequency();
 	    assert freq == 4: "Hi Ho Hi Ho, H: " + freq;
 	    // Write your testCase here
-
-
+     	　　//前回作成したコード
+            myObject = new Frequencer();
+            myObject.setSpace("Hi Ho Hi Ho Hi Ho".getBytes());
+            myObject.setTarget("Ho Hi".getBytes());
+            freq = myObject.frequency();
+            assert freq == 2 : "Hi Ho Hi Ho Hi Ho, Ho Hi: " + freq;
+	    
+	    //以下，ChatGPTにより生成されたコード
+	    /*
+	    myObject = new Frequencer();
+            myObject.setSpace("Hello World".getBytes());
+            myObject.setTarget("SearchTarget".getBytes());
+            freq = myObject.frequency();
+            System.out.println("Test case failed: No exception thrown for target length greater than space length");
+            success = false;
+	    */
 	}
 	catch(Exception e) {
 	    System.out.println("Exception occurred in Frequencer Object");

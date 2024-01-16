@@ -21,14 +21,22 @@ public class Frequencer implements FrequencerInterface {
     static boolean debugMode = false;
     byte[] myTarget;
     byte[] mySpace;
+    boolean targetready = false;
+    boolean spacereday = false;
 
     @Override
     public void setTarget(byte[] target) {
-        myTarget = target;
+        if(target.length > 0){
+            myTarget = target;
+            targetready = true;
+        }
     }
     @Override
     public void setSpace(byte[] space) {
-        mySpace = space;
+        if(space.length > 0){
+            mySpace = space;
+            spacereday = true;
+        }
     }
 
     private void showVariables() {
@@ -40,18 +48,23 @@ public class Frequencer implements FrequencerInterface {
 
     @Override
     public int frequency() {
+        if(targetready == false) return -1;
+        if(spacereday == false) return 0;
         int targetLength = myTarget.length;
         int spaceLength = mySpace.length;
         int count = 0;
-	if(debugMode) { showVariables(); }
-        for(int start = 0; start<spaceLength; start++) { // Is it OK?
+    
+
+	    if(debugMode) { showVariables(); }
+        for(int start = 0; start<=spaceLength - targetLength; start++) { // Is it OK?
             boolean abort = false;
             for(int i = 0; i<targetLength; i++) {
                 if(myTarget[i] != mySpace[start+i]) { abort = true; break; }
             }
             if(abort == false) { count++; }
         }
-	if(debugMode) { System.out.printf("%10d\n", count); }
+	    if(debugMode) { System.out.printf("%10d\n", count); }
+
         return count;
     }
 
@@ -59,7 +72,34 @@ public class Frequencer implements FrequencerInterface {
     @Override
     public int subByteFrequency(int start, int length) {
         // Not yet implemented, but it should be defined as specified.
-        return -1;
+        int targetLength = myTarget.length;
+        int spaceLength = mySpace.length;
+        int count = 0;
+        if(targetready == false) return -1;
+        if(spacereday == false) return 0;
+
+        if( start > length || start > spaceLength || length > spaceLength){
+            return -1;
+        }
+        
+        /*List<byte> list = new ArrayList<>();
+        for(int i=start; start<length; i++){
+            list.add(myTarget[i]);
+        }
+        byte[] subTarget =list.toArray(new byte[list.size()]);
+
+        if(debugMode) { showVariables(); }
+        for(int start1 = 0; start1<=spaceLength - targetLength; start1++) { // Is it OK?
+            boolean abort = false;
+            for(int i = 0; i<targetLength; i++) {
+                if(subTarget[i] != mySpace[start1+i]) { abort = true; break; }
+            }
+            if(abort == false) { count++; }
+        }
+	    if(debugMode) { System.out.printf("%10d\n", count); }
+        */
+
+        return count;
     }
 
     public static void main(String[] args) {

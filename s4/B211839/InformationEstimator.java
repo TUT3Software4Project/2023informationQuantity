@@ -40,25 +40,40 @@ public class InformationEstimator implements InformationEstimatorInterface {
 
     // f: information quantity for a count, -log2(count/sizeof(space))
     double f(int freq) {
-        return  - Math.log10((double) freq / (double) mySpace.length)/ Math.log10((double) 2.0);
+	if (freq == 0) {
+        　  // 頻度が0の場合、情報量は無限大と見なす
+            return Double.POSITIVE_INFINITY;
+    	} else {
+            return  - Math.log10((double) freq / (double) mySpace.length)/ Math.log10((double) 2.0);
+	}
     }
 
     @Override
     public void setTarget(byte[] target) {
+	if (target == null) {
+            throw new IllegalArgumentException("Target cannot be null");
+    	}
         myTarget = target;
     }
 
     @Override
     public void setSpace(byte[] space) {
+	if (space == null) {
+        throw new IllegalArgumentException("Space cannot be null");
+    	}
         myFrequencer = new Frequencer();
         mySpace = space; myFrequencer.setSpace(space);
     }
 
     @Override
     public double estimation(){
+	if (myTarget == null || myTarget.length == 0 || mySpace == null || mySpace.length == 0) {
+            // ターゲットまたはサンプル空間がセットされていない場合や、空のサンプル空間の場合
+            return 0.0;
+    	}
         boolean [] partition = new boolean[myTarget.length+1];
         int np = 1<<(myTarget.length-1);
-        double value = Double.MAX_VALUE; // value = mininimum of each "value1".
+        double value = Double.POSITIVE_INFINITY; // value = mininimum of each "value1".
 	if(debugMode) { showVariables(); }
         if(debugMode) { System.out.printf("np=%d length=%d ", np, +myTarget.length); }
 
@@ -115,6 +130,11 @@ public class InformationEstimator implements InformationEstimatorInterface {
         value = myObject.estimation();
         myObject.setTarget("00".getBytes());
         value = myObject.estimation();
+	myObject.setTarget("4".getBytes());
+        value = myObject.estimation();
+	myObject.setTarget("".getBytes());
+        value = myObject.estimation();
+	
     }
 }
 

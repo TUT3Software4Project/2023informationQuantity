@@ -45,6 +45,11 @@ public class TestCase {
 	    freq = myObject.frequency();
 	    assert freq == 4: "Hi Ho Hi Ho, H: " + freq;
 	    // Write your testCase here
+	    myObject.setSpace("Hi Ho Hi Ho".getBytes());
+            myObject.setTarget("Hi Ho Hi Ho".getBytes());
+            freq = myObject.frequency();
+            assert freq == 0 : "Target length > remaining space length: " + freq;
+		//
 
 
 	}

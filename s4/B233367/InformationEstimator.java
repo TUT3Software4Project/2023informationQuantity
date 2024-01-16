@@ -56,6 +56,10 @@ public class InformationEstimator implements InformationEstimatorInterface {
 
     @Override
     public double estimation(){
+        // It returns Double.MAX_VALUE, when the true value is infinite, or space is not set.
+        if(myTarget == null || myTarget.length == 0) return 0.0;
+        if(mySpace == null) return Double.MAX_VALUE;
+
         boolean [] partition = new boolean[myTarget.length+1];
         int np = 1<<(myTarget.length-1);
         double value = Double.MAX_VALUE; // value = mininimum of each "value1".
@@ -87,7 +91,12 @@ public class InformationEstimator implements InformationEstimatorInterface {
                 }
                 // System.out.print("("+start+","+end+")");
                 myFrequencer.setTarget(subBytes(myTarget, start, end));
-                value1 = value1 + f(myFrequencer.frequency());
+                int freq = myFrequencer.frequency();
+                if(freq == 0){
+                    value1 = Double.MAX_VALUE;
+                    break;
+                }
+                value1 = value1 + f(freq);
 		// it should  -->   value1 = value1 + f(myFrequencer.subByteFrequency(start, end)
 		// note that subByteFrequency is not work for B233367 version.
                 start = end;

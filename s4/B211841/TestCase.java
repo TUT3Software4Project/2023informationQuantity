@@ -44,7 +44,45 @@ public class TestCase {
 	    myObject.setTarget("H".getBytes());
 	    freq = myObject.frequency();
 	    assert freq == 4: "Hi Ho Hi Ho, H: " + freq;
-	    // Write your testCase here
+
+		myObject.setSpace("Hiii".getBytes()); // space: 4 bytes
+		myObject.setTarget("Hiiii".getBytes()); // target: 5 bytes
+		freq = myObject.frequency();
+		assert freq == 0: "Hiii, Hiiii: " + freq;
+
+
+		myObject.setSpace("".getBytes());
+		myObject.setTarget("Hiiii".getBytes());
+		freq = myObject.frequency();
+		assert freq == 0 : "NotSet,Hiiii" + freq;
+
+		myObject.setSpace("Hiii".getBytes());
+		myObject.setTarget("".getBytes());
+		freq = myObject.frequency();
+		assert freq == -1 : "Hiii, NotSet" + freq;
+
+		myObject.setSpace("AAAA".getBytes());
+		myObject.setTarget("AA".getBytes());
+		freq = myObject.frequency();
+		assert freq == 3: "AAAA,AA: " + freq;
+
+
+// //Week1-STEP13
+//             myObject = new Frequencer();
+//             myObject = new Frequencer();
+//             myObject.setSpace("Hi".getBytes());
+//             myObject.setTarget("HiH".getBytes());
+//             freq = myObject.frequency();
+//             assert freq == 0: "HiH: " + freq;
+// //Week1-STEP14
+//             myObject = new Frequencer();
+//             freq = myObject.frequency();
+//             assert freq == -1: "TARGET is not set or TARGET's length is zero";
+//             myObject = new Frequencer();
+//             freq = myObject.frequency();
+//             assert freq == 0: "SPACE is not set or Space's length is zero";
+//             // Write your testCase here
+
 
 
 	}

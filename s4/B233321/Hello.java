@@ -3,7 +3,7 @@ import java.lang.*;
 
 public class Hello {
     public static void main(String[] args) {
-        System.out.println("hello..(B233321)");
+        System.out.println("hello..(別の文字(なんでもよい))");
     }
 }
 

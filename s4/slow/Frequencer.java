@@ -39,11 +39,13 @@ public class Frequencer implements FrequencerInterface{
 	}
 	return count;
     }
+
     public int frequency() {
 	if(targetReady == false) return -1;
 	if(spaceReady == false) return 0;
 	return subByteFrequency(0, myTarget.length);
     }
+
     public static void main(String[] args) {
 	Frequencer frequencerObject;
 	try {

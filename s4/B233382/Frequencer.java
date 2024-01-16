@@ -44,6 +44,16 @@ public class Frequencer implements FrequencerInterface {
         int spaceLength = mySpace.length;
         int count = 0;
 	if(debugMode) { showVariables(); }
+
+	// check for other conditions here
+	if(targetLength == 0 || myTarget == null){
+		return -1;
+	}
+	if(spaceLength == 0 || mySpace == null){
+		return 0;
+	}
+
+	// count occurrences of target     
         for(int start = 0; start<spaceLength; start++) { // Is it OK?
             boolean abort = false;
             for(int i = 0; i<targetLength; i++) {
@@ -52,14 +62,20 @@ public class Frequencer implements FrequencerInterface {
             if(abort == false) { count++; }
         }
 	if(debugMode) { System.out.printf("%10d\n", count); }
+	    
         return count;
     }
 
     // I know that here is a potential problem in the declaration.
     @Override
-    public int subByteFrequency(int start, int length) {
+    public int subByteFrequency(int start, int end) {
+	byte[] result = new byte[end - start];
+        for(int i = 0; i<end - start; i++) { result[i] = myTarget[start + i]; };
+
+	setTarget(result);
+        return frequency();
         // Not yet implemented, but it should be defined as specified.
-        return -1;
+        // return -1;
     }
 
     public static void main(String[] args) {

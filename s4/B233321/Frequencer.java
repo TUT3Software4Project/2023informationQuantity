@@ -59,6 +59,26 @@ public class Frequencer implements FrequencerInterface {
     @Override
     public int subByteFrequency(int start, int length) {
         // Not yet implemented, but it should be defined as specified.
+
+
+	int targetLength = myTarget.length;
+	if((start!=0)&&(length<targetLength){
+	int count = 0;
+        for(int j = start; j<targetLength; j++) {
+            boolean abort = false;
+            for(int i = 0; i<length; i++) {
+                if(subByte[i] != myTarget[start+i]) { abort = true; break; }
+            }
+            if(abort == false) { count++; }
+        }
+	if(debugMode) { System.out.printf("%10d\n", count); }
+        return count;
+	}
+	else
+
+
+
+		
         return -1;
     }
 
