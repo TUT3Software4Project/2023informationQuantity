@@ -38,34 +38,59 @@ public class Frequencer implements FrequencerInterface {
         System.out.write(' ');
     }
 
+    // @Override
+    // public int frequency() {
+    //     if (myTarget == null || myTarget.length == 0) {
+    //         return -1;
+    //     }
+    //     if (mySpace == null) {
+    //         return 0;
+    //     }
+    //     int targetLength = myTarget.length;
+    //     int spaceLength = mySpace.length;
+    //     int count = 0;
+    //     if(debugMode) { showVariables(); }
+    //     for(int start = 0; start<spaceLength - targetLength + 1; start++) { // Is it OK?
+    //         boolean abort = false;
+    //         for(int i = 0; i<targetLength; i++) {
+    //             if(myTarget[i] != mySpace[start+i]) { abort = true; break; }
+    //         }
+    //         if(abort == false) { count++; }
+    //     }
+    //     if(debugMode) { System.out.printf("%10d\n", count); }
+    //     return count;
+    // }
+
     @Override
-    public int frequency() {
+    public int frequency () {
         if (myTarget == null || myTarget.length == 0) {
             return -1;
         }
         if (mySpace == null) {
             return 0;
         }
-        int targetLength = myTarget.length;
-        int spaceLength = mySpace.length;
-        int count = 0;
-        if(debugMode) { showVariables(); }
-        for(int start = 0; start<spaceLength - targetLength + 1; start++) { // Is it OK?
-            boolean abort = false;
-            for(int i = 0; i<targetLength; i++) {
-                if(myTarget[i] != mySpace[start+i]) { abort = true; break; }
-            }
-            if(abort == false) { count++; }
-        }
-        if(debugMode) { System.out.printf("%10d\n", count); }
-        return count;
+        return subByteFrequency(0, myTarget.length);
     }
 
     // I know that here is a potential problem in the declaration.
     @Override
-    public int subByteFrequency(int start, int length) {
+    public int subByteFrequency(int start, int end) {
         // Not yet implemented, but it should be defined as specified.
-        return -1;
+        int spaceLength = mySpace.length;
+        int count = 0;
+        for (int offset = 0; offset <= spaceLength - (end - start); offset++) {
+            boolean abort = false;
+            for (int i = 0; i < (end - start); i++) {
+                if(myTarget[start + i] != mySpace[offset + i]) {
+                    abort = true;
+                    break;
+                }
+            }
+            if (abort == false) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public static void main(String[] args) {
