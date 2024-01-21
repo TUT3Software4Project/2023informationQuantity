@@ -416,6 +416,7 @@ public class FrequencerSuffix implements FrequencerInterface {
 			}
 			//2文字でのテスト
 			frequencerObject.setSpace("Hi Ho Hi Ho".getBytes());
+			System.out.println("space length:" + frequencerObject.mySpace.length);
 			frequencerObject.printSuffixArray();
 			frequencerObject.setTarget("Hi".getBytes());
 			result = frequencerObject.frequency();
@@ -424,15 +425,15 @@ public class FrequencerSuffix implements FrequencerInterface {
 			if (except_value == result) {
 				System.out.println("OK");
 			} else {
-				System.out.println("WRONG");
+				System.out.println("WRONG ,value=" + result);
 			}
-			//探索地点が終点を超えるときのテスト
+			// 探索地点が終点を超えるときのテスト
 			frequencerObject.setTarget("z".getBytes());
 			result = frequencerObject.frequency();
-			except_value = 2;
+			except_value = 0;
 			System.out.print("Freq = " + result + " ");
 			if ((except_value == result) && (frequencerObject.subByteEndIndex(0,
-					frequencerObject.mySpace.length) == frequencerObject.mySpace.length + 1)) {
+					frequencerObject.mySpace.length) == frequencerObject.mySpace.length)) {
 				System.out.println("OK");
 			} else {
 				System.out.println("WRONG value : " + result + " end pos : " + frequencerObject.subByteEndIndex(0,
