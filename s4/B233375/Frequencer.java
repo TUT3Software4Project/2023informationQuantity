@@ -48,13 +48,13 @@ public class Frequencer implements FrequencerInterface {
 
     @Override
     public int frequency() {
-        //targetが設定されているか確認する
-        if  (Objects.isNull(myTarget)) {
+        // targetが設定されているか確認する
+        if (Objects.isNull(myTarget)) {
             return -1;
 
         }
-        //spaceが設定されているか確認する
-        if  (Objects.isNull(mySpace)) {
+        // spaceが設定されているか確認する
+        if (Objects.isNull(mySpace)) {
             return 0;
         }
         int targetLength = myTarget.length;// not set の場合は0になる?->null pointerになった
@@ -99,9 +99,72 @@ public class Frequencer implements FrequencerInterface {
 
     // I know that here is a potential problem in the declaration.
     @Override
-    public int subByteFrequency(int start, int length) {
+    public int subByteFrequency(int start, int end) {
+        // dev note : Frequencyの内容を利用
         // Not yet implemented, but it should be defined as specified.
-        return -1;
+        // 半開区間での出現数を求める
+        // 始点・終点が不正なものは未定義でよい
+        // targetが設定されているか確認する
+        if (Objects.isNull(myTarget)) {
+            System.err.println("target not set");
+            return -1;
+
+        }
+        // spaceが設定されているか確認する
+        if (Objects.isNull(mySpace)) {
+            System.err.println("space not set");
+            return 0;
+        }
+        int targetLength = end-start;// not set の場合はnull pointerに
+        int spaceLength = mySpace.length;// not set の場合は null pointer に
+        // TARGETの長さが0でないかを確認する
+        if (end-start == 0) {
+            System.err.println("target length is 0");
+            return -1;
+        }
+        // space の長さが0でないかを確認する
+        if (spaceLength == 0) {
+            System.err.println("space length is 0");
+            return 0;
+        }
+        // 区間が正当なものか確認する
+        if (start < 0 || start > end) {
+            System.err.println("range invalid");
+            return -2;
+        }
+        if (end > myTarget.length) {
+            System.err.println("end value is invalid");
+            return -2;
+        }
+        int count = 0;
+        if (debugMode) {
+            showVariables();
+        }
+        // Otherwise, get the frequency of TAGET in SPACE
+
+        // space abcd(4) -> 0,1,2 -> i=0; i<= space length - target length
+        // target ab(2)
+
+        // space ab(2) -> 0 : i=0 : i< space length - target length
+        // target ab(2)
+        for (int in_start =0; in_start <= spaceLength - targetLength; in_start++) { // Is it OK?
+                                                                            // //開始地点(0文字目からtargetの最後がspaceの最後に一致するまで)
+            boolean abort = false;// 先頭からみて文字が一致していているか
+            for (int i = start; i < end; i++) {
+                if (myTarget[i] != mySpace[in_start + i-start]) {// 文字が一致していなかったら
+                    abort = true;// 中断+先頭を次に移す
+                    break;
+                }
+            }
+            if (abort == false) {// 最後まで一致したら
+                count++;// カウントを増やす
+            }
+        }
+        if (debugMode) {
+            System.out.printf("%10d\n", count);
+        }
+        return count;
+        //return -1;
     }
 
     public static void main(String[] args) {
@@ -114,6 +177,9 @@ public class Frequencer implements FrequencerInterface {
             myObject.setSpace("Hi Ho Hi Ho".getBytes());
             myObject.setTarget("H".getBytes());
             freq = myObject.frequency();
+            myObject.setSpace("3210321001230123".getBytes());
+            myObject.setTarget("3210321001230123".getBytes());
+            myObject.subByteFrequency(0, 16);
         } catch (Exception e) {
             System.out.println("Exception occurred: STOP");
             e.printStackTrace();

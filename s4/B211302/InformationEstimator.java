@@ -22,6 +22,8 @@ public class InformationEstimator implements InformationEstimatorInterface {
     byte[] myTarget; // data to compute its information quantity
     byte[] mySpace;  // Sample space to compute the probability
     FrequencerInterface myFrequencer;  // Object for counting frequency
+    boolean targetready = false;
+    boolean spaceready = false;
 
     private void showVariables() {
 	for(int i=0; i< mySpace.length; i++) { System.out.write(mySpace[i]); }
@@ -46,16 +48,27 @@ public class InformationEstimator implements InformationEstimatorInterface {
     @Override
     public void setTarget(byte[] target) {
         myTarget = target;
+	if(target.length > 0){
+		targetready = true;
+	}
+	
     }
 
     @Override
     public void setSpace(byte[] space) {
         myFrequencer = new Frequencer();
         mySpace = space; myFrequencer.setSpace(space);
+	spaceready = true;
     }
 
     @Override
     public double estimation(){
+	if (targetready == false) {
+           return (double) 0.0;
+        }
+	if (spaceready == false) {
+            return Double.MAX_VALUE;
+        }
         boolean [] partition = new boolean[myTarget.length+1];
         int np = 1<<(myTarget.length-1);
         double value = Double.MAX_VALUE; // value = mininimum of each "value1".
@@ -87,16 +100,22 @@ public class InformationEstimator implements InformationEstimatorInterface {
                 }
                 // System.out.print("("+start+","+end+")");
                 myFrequencer.setTarget(subBytes(myTarget, start, end));
+		int freq = myFrequencer.frequency();
                 value1 = value1 + f(myFrequencer.frequency());
 		// it should  -->   value1 = value1 + f(myFrequencer.subByteFrequency(start, end)
 		// note that subByteFrequency is not work for B211302 version.
-                start = end;
-            }
-            // System.out.println(" "+ value1);
-
+		if(freq == 0){
+			value1 = Double.MAX_VALUE;
+			break;
+		}
+		if(freq == 0) return (double) 0.0;
+		value1 = value1 + f(freq);
+		start = end;
+	    }
+	    // System.out.println(" "+ value1);
             // Get the minimal value in "value"
-            if(value1 < value) value = value1;
-        }
+	    if(value1 < value) value = value1;
+	}
 	if(debugMode) { System.out.printf("%10.5f\n", value); }
         return value;
     }

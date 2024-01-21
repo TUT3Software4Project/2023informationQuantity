@@ -46,6 +46,7 @@ public class InformationEstimator implements InformationEstimatorInterface {
     @Override
     public void setTarget(byte[] target) {
         myTarget = target;
+        if(myFrequencer != null) myFrequencer.setTarget(target);
     }
 
     @Override
@@ -90,12 +91,12 @@ public class InformationEstimator implements InformationEstimatorInterface {
                     end++;
                 }
                 // System.out.print("("+start+","+end+")");
-                myFrequencer.setTarget(subBytes(myTarget, start, end));
-                int freq = myFrequencer.frequency();
+                int freq = myFrequencer.subByteFrequency(start, end);
                 if(freq == 0){
                     value1 = Double.MAX_VALUE;
                     break;
                 }
+                if(freq < 0) return (double) 0.0;
                 value1 = value1 + f(freq);
 		// it should  -->   value1 = value1 + f(myFrequencer.subByteFrequency(start, end)
 		// note that subByteFrequency is not work for B233367 version.
