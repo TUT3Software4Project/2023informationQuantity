@@ -56,7 +56,6 @@ private int suffixCompare(int i, int j) {
         // if suffix_i < suffix_j, it returns -1  
         // if suffix_i = suffix_j, it returns 0;   
 	int spaceLength = mySpace.length;
-        // ここにコードを記述せ
 	if(i == j)
 		return 0;
 	if(i < j)
@@ -91,7 +90,6 @@ public void setSpace(byte []space) {
             suffixArray[i] = i; // Please note that each suffix is expressed by one integer.      
         }
         //                                            
-        // ここに、int suffixArrayをソートするコードを書け。
         // もし、mySpace が"ABC"ならば、
         // suffixArray = { 0, 1, 2} となること求められる。
         // このとき、printSuffixArrayを実行すると
@@ -136,7 +134,6 @@ public void setSpace(byte []space) {
 	return subByteFrequency(0, myTarget.length);
     }
 
-    // I know that here is a potential problem in the declaration.
     @Override
     public int subByteFrequency(int start, int end) {
 	// start, and end specify a string to search in myTarget,
@@ -157,7 +154,6 @@ public void setSpace(byte []space) {
            }
         */
         // The following the counting method using suffix array.
-        // 演習の内容は、適切なsubByteStartIndexとsubByteEndIndexを定義することである。
         int first = subByteStartIndex(start, end);
         int last1 = subByteEndIndex(start, end);
         return last1 - first;
@@ -194,9 +190,7 @@ public void setSpace(byte []space) {
         //    if suffix_i is "Ho Hi Ho", and target_j_k is "Ho", 
         //            targetCompare should return 0;
         //    if suffix_i is "Ho Hi Ho", and suffix_j is "Ho", 
-        //            suffixCompare should return 1. (It was written -1 before 2021/12/21)
-        //
-        // ここに比較のコードを書け 
+        //            suffixCompare should return 1. 
         
 	int x,baf;
 	if(mySpace.length - i <k - j)
@@ -240,15 +234,13 @@ private int subByteStartIndex(int start, int end) {
         // Assuming the suffix array is created from "Hi Ho Hi Ho",                 
         // if target_start_end is "Ho", it will return 5.                           
         // Assuming the suffix array is created from "Hi Ho Hi Ho",                 
-        // if target_start_end is "Ho ", it will return 6.                
-        //                                                                          
-        // ここにコードを記述せよ。                                                 
+        // if target_start_end is "Ho ", it will return 6.                                                            
         //                                      
 	int i;
 	for(i = 0;i < mySpace.length;i++){
-		if(targetCompare(suffixArray[i],start,end) == 0)
+		if(targetCompare(suffixArray[i],start,end) >= 0)
 			return i;
-	}return 0; 
+	}return mySpace.length; 
     }
 private int subByteEndIndex(int start, int end) {
         //suffix arrayのなかで、目的の文字列の出現しなくなる場所を求めるメソッド
@@ -276,14 +268,12 @@ private int subByteEndIndex(int start, int end) {
         // if target_start_end is "Ho", it will return 7 for "Hi Ho Hi Ho".  
         // Assuming the suffix array is created from "Hi Ho Hi Ho",          
         // if target_start_end is"i", it will return 9 for "Hi Ho Hi Ho".    
-        //                                                                   
-        //　ここにコードを記述せよ                                           
-        //       
+        //                                                                     
 	int i;
-	for(i = 0;i < mySpace.length;i++){
-		if(targetCompare(suffixArray[i],start,end) == 1)
-			return i;
-	}return mySpace.length; 
+	for(i = mySpace.length - 1;i >= 0;i--){
+		if(targetCompare(suffixArray[i],start,end) <= 0)
+			return i + 1;
+	}return 0; 
     }
     public static void main(String[] args) {
         Frequencer frequencerObject;

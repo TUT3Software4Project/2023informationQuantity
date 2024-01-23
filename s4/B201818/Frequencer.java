@@ -17,10 +17,11 @@ interface FrequencerInterface {  // This interface provides the design for frequ
 
 
 public class Frequencer implements FrequencerInterface {
-    // Code to Test, *warning: This code contains intentional problem*
     static boolean debugMode = false;
     byte[] myTarget;
     byte[] mySpace;
+    boolean targetReady = false;
+    boolean spaceReady = false;
     int []  suffixArray;
 
     private void printSuffixArray() {
@@ -39,28 +40,31 @@ public class Frequencer implements FrequencerInterface {
     @Override
     public void setTarget(byte[] target) {
         myTarget = target;
+	targetReady = true;
     }
     @Override
     public void setSpace(byte[] space) {
         mySpace = space;
+	spaceReady = true;
         if(space.length != 0){
             suffixArray = new int[space.length];
             for(int i = 0;i<space.length;i++) {
             suffixArray[i] = i;//suffixArrayの中身は0,1,2,3...space.length-1になる
             }
-	}
-	
-	for(int r = 0;r<(space.length-1);r++){
-   	     for(int i = (space.length-1);i>r;i--){//辞書順になるようにバブルソート
+	    //マージソート
+	    //suffixArray = msort(suffixArray);
+	    //辞書順になるようにバブルソート
+	    for(int r = 0;r<(space.length-1);r++){
+   	         for(int i = (space.length-1);i>r;i--){
 			if(suffixCompare(suffixArray[i],suffixArray[i-1]) == -1){
 				int a = suffixArray[i];
 				suffixArray[i] = suffixArray[i-1];
 				suffixArray[i-1] = a;
 			}
 		}
+	    }
 	}
     }
-
     private int suffixCompare(int i, int j) {
         // suffixCompareはソートのための比較メソッドである。
         // 次のように定義せよ。
@@ -104,6 +108,34 @@ public class Frequencer implements FrequencerInterface {
 	}
 	return 0;
     }
+
+    /*private int[] msort(suffixArray){
+	if(suffixArray.length==1){
+		return suffixArray;
+	}
+	
+	if(suffixArray.length % 2 == 0){
+	    if(suffixArray.length==2){
+		if(suffixCompare(suffixArray[0],suffixArray[1]) == -1){//辞書順に入れ替え
+			x = suffixArray[0];
+			uffixArray[0] = suffixArray[1];
+			y = x;
+		}
+		return suffixArray;
+	    }
+            int[] a = msort(suffixArray.slice(0,(suffixArray.length / 2)));
+            int[] b = msort(suffixArray.slice(suffixArray.length / 2),suffixArray.length);
+	}else{
+	    if(suffixArray.length==1){
+		return suffixArray;
+	    }
+	    int[] a = msort(suffixArray.slice(0,(suffixArray.length / 2)));
+            int[] b = msort(suffixArray.slice(suffixArray.length / 2),suffixArray.length);
+	}
+
+	//配列aとbを辞書順にマージしリターン
+
+    }*/
 	
     private void showVariables() {
 	for(int i=0; i< mySpace.length; i++) { System.out.write(mySpace[i]); }
@@ -114,12 +146,21 @@ public class Frequencer implements FrequencerInterface {
 
     @Override
     public int frequency() {
+	if(targetReady == false){//ターゲットが未セットな時にreturn -1
+		return -1;
+	}
+	if(spaceReady == false){//スペースが未セットな時にreturn 0
+		return 0;
+	}
 	int targetLength = myTarget.length;
 	int spaceLength = mySpace.length;
 	if(myTarget.length == 0){//ターゲットが不正な時にreturn -1
 		return -1;
 	}
 	if(mySpace.length == 0){//スペースが不正な時にreturn 0
+		return 0;
+	}
+	if(mySpace.length < myTarget.length){//スペースよりターゲットの方が大きい時にreturn 0
 		return 0;
 	}
 	/*
@@ -141,7 +182,6 @@ public class Frequencer implements FrequencerInterface {
     // I know that here is a potential problem in the declaration.
     @Override
     public int subByteFrequency(int s, int e) {
-        // Not yet implemented, but it should be defined as specified.
 	if((s > myTarget.length-1) || (e > myTarget.length) || (s >= e)){//正しくない引数の場合はreturn -1
         	return -1;
 	}//この辺の正しさの定義がよくわからない
@@ -165,6 +205,7 @@ public class Frequencer implements FrequencerInterface {
 	if(debugMode) { System.out.printf("%10d\n", count); }
         return count;*/
 	int first = subByteStartIndex(s, e);//いくつ目のサフィックスアレイから一致しているか
+	if(first == -1) return 0;
         int last1 = subByteEndIndex(s, e);//いくつ目のサフィックスアレイから不一致になるか
         return last1 - first;
     }
@@ -199,14 +240,16 @@ public class Frequencer implements FrequencerInterface {
 	int i,j;
 	for (i = 0;i<mySpace.length;i++){
 	    boolean abort = false;
+            if((suffixArray[i] + (end-start)) <= mySpace.length){//文字数を超過していれば
             for(j = 0; j<(end-start); j++) {//開始地点からターゲットと一致しているか一文字ずつ調べる。
-                if(myTarget[start+j] != mySpace[suffixArray[i]+j]) { abort = true; break; }//一文字でも一致していなければbreak
-            }
+                if(myTarget[start+j] != mySpace[suffixArray[i] + j]) { abort = true; break; }//一文字でも一致していなければbreak
+            	}
             if(abort == false) { 
 		return i;
 	    }//全文字一致だった時にカウント
+	  }
         }
-        return 0;
+        return -1;
     }
 
     private int subByteEndIndex(int start, int end) {
@@ -240,25 +283,29 @@ public class Frequencer implements FrequencerInterface {
 	int i,j;
 	for (i = 0;i<mySpace.length;i++){
 	    boolean abort = false;
+            if((suffixArray[i] + (end-start)) <= mySpace.length){//文字数を超過していれば
             for(j = 0; j<(end-start); j++) {//開始地点からターゲットと一致しているか一文字ずつ調べる。
                 if(myTarget[start+j] != mySpace[suffixArray[i]+j]) { abort = true; break; }//一文字でも一致していなければbreak
             }
             if(abort == false) { 
 		break;
 	    }//全文字一致だった時ブレーク
-        }
+            }
+	}
 	    
 	//カウントが進んだ状態からスタート
 	for (i = i;i<mySpace.length;i++){
 	    boolean abort = true;
+            if((suffixArray[i] + (end-start)) > mySpace.length){return i;}//文字数を超過していれば
             for(j = 0; j<(end-start); j++) {//開始地点からターゲットと一致しているか一文字ずつ調べる。
                 if(myTarget[start+j] != mySpace[suffixArray[i]+j]) { abort = false; break; }//一文字でも一致していなければbreak
             }
             if(abort == false) { 
 		return i;
 	    }//不一致だった時にリターン
-        }                           
-        return 0;
+            }
+	if(i == mySpace.length) return i;//ターゲット文字数が1かつ最後のアレイまで一致していてfor文を超過した場合
+        return -1;
     }
 
     public static void main(String[] args) {
@@ -271,23 +318,106 @@ public class Frequencer implements FrequencerInterface {
                 myObject.setSpace("Hi Ho Hi Ho".getBytes());//探される文をセット
                 myObject.setTarget("H".getBytes());//探す単語をセット
                 freq = myObject.frequency();
-
-		/*myObject = new Frequencer();
-                myObject.setSpace("ABC".getBytes());
-                myObject.printSuffixArray();
+		assert freq == 4 : "test1:" + freq;
+		}
+        catch(Exception e) {
+            System.out.println("Exception occurred: STOP1");
+        }
+        try {
+		myObject = new Frequencer();
+                myObject.setSpace("Hi Ho Hi Ho".getBytes());//探される文をセット
+                myObject.setTarget("Hi Ho Hi Ho Hi Ho".getBytes());//探す単語をセット
+                freq = myObject.frequency();
+		assert freq == 0 : "test2:" + freq;
+		}
+        catch(Exception e) {
+            System.out.println("Exception occurred: STOP2");
+        }
+	
+       try {
                 myObject = new Frequencer();
-                myObject.setSpace("CBA".getBytes());
-                myObject.printSuffixArray();
+                myObject.setTarget("Hi Ho Hi Ho Hi Ho".getBytes());//探す単語をセット
+                freq = myObject.frequency();
+		assert freq == 0 : "test3:" + freq;
+	       }
+        catch(Exception e) {
+            System.out.println("Exception occurred: STOP3");
+        }
+	
+       try {
+		myObject = new Frequencer();
+                myObject.setSpace("Hi Ho Hi Ho".getBytes());//探される文をセット
+                freq = myObject.frequency();
+		assert freq == -1 : "test4:" + freq;
+	}
+        catch(Exception e) {
+            System.out.println("Exception occurred: STOP4:");
+        }
+	
+       try {
+		myObject = new Frequencer();
+                myObject.setSpace("Hi Ho Hi Ho".getBytes());//探される文をセット
+                myObject.setTarget("Hi Ho Hi Ho".getBytes());//探す単語をセット
+                freq = myObject.frequency();
+		assert freq == 1 : "test5:" + freq;
+	}
+        catch(Exception e) {
+            System.out.println("Exception occurred: STOP5");
+        }
+        try {
                 myObject = new Frequencer();
-                myObject.setSpace("HHH".getBytes());
-                myObject.printSuffixArray();
-                myObject = new Frequencer();
-                myObject.setSpace("Hi Ho Hi Ho".getBytes());
-                myObject.printSuffixArray();*/
-		
+                myObject.setSpace("Hi Ho Hi Ho".getBytes());//探される文をセット
+                myObject.setTarget("i".getBytes());//探す単語をセット
+                freq = myObject.frequency();
+		assert freq == 2 : "test6:" + freq;
         }
         catch(Exception e) {
-            System.out.println("Exception occurred: STOP");
+            System.out.println("Exception occurred: STOP6");
         }
+	try {
+                myObject = new Frequencer();
+                myObject.setSpace("Hi Ho Hi Ho".getBytes());//探される文をセット
+                myObject.setTarget("H".getBytes());//探す単語をセット
+                freq = myObject.frequency();
+		assert freq == 4 : "test6:" + freq;
+        }
+        catch(Exception e) {
+            System.out.println("Exception occurred: STOP9");
+        }
+
+	try {
+                myObject = new Frequencer();
+                myObject.setSpace("H".getBytes());//探される文をセット
+                myObject.setTarget("i".getBytes());//探す単語をセット
+                freq = myObject.frequency();
+		assert freq == 0 : "test6:" + freq;
+        }
+        catch(Exception e) {
+            System.out.println("Exception occurred: STOP7");
+        }
+
+        try {
+                myObject = new Frequencer();
+                myObject.setSpace("Hi Ho Hi Ho".getBytes());//探される文をセット
+                myObject.setTarget("H".getBytes());//探す単語をセット
+                freq = myObject.frequency();
+		assert freq == 4 : "test6:" + freq;
+        }
+        catch(Exception e) {
+            System.out.println("Exception occurred: STOP8");
+        }
+	    
+	/*myObject = new Frequencer();
+        myObject.setSpace("ABC".getBytes());
+        myObject.printSuffixArray();
+        myObject = new Frequencer();
+        myObject.setSpace("CBA".getBytes());
+        myObject.printSuffixArray();
+        myObject = new Frequencer();
+        myObject.setSpace("H".getBytes());
+        myObject.printSuffixArray();
+        myObject = new Frequencer();
+        myObject.setSpace("Hi Ho Hi Ho".getBytes());
+        myObject.printSuffixArray();*/
     }
 }

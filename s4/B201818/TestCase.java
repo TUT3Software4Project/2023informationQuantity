@@ -44,7 +44,31 @@ public class TestCase {
 	    myObject.setTarget("H".getBytes());
 	    freq = myObject.frequency();
 	    assert freq == 4 : "Hi Ho Hi Ho, H: " + freq;
-
+		
+	    myObject = new Frequencer();
+	    myObject.setSpace("Hi Ho H".getBytes());
+	    myObject.setTarget("H".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == 3 : "Hi Ho H, H: " + freq;
+		
+	    myObject = new Frequencer();
+	    myObject.setSpace("Hi Ho Hi Ho".getBytes());
+	    myObject.setTarget("Hi Ho".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == 2 : "Hi Ho Hi Ho, Hi Ho: " + freq;
+		
+	    myObject = new Frequencer();
+	    myObject.setSpace("Hi Ho Hi Ho".getBytes());
+	    myObject.setTarget("Hi Ho H".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == 1 : "Hi Ho Hi Ho, Hi Ho H: " + freq;
+		
+	    myObject = new Frequencer();
+	    myObject.setSpace("Hi Ho Hi Ho".getBytes());
+	    myObject.setTarget("Hi Ho Hi Ho Hi Ho".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == 0 : "Hi Ho Hi Ho, Hi Ho Hi Ho Hi Ho: " + freq;
+		
 	    // 空のターゲットでテスト
 	    myObject.setTarget("".getBytes());
 	    freq = myObject.frequency();
@@ -81,7 +105,7 @@ public class TestCase {
 
 	} catch (ArrayIndexOutOfBoundsException e) {
     	// This is the expected behavior, the test has passed
-    		System.out.println("Exception occurred in Frequencer Object Because target length is greater than space length");
+    		System.out.println("husei na index de array ni access");
 	} 
 	catch(Exception e) {
 	    System.out.println("Exception occurred in Frequencer Object");

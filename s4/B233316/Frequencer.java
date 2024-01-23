@@ -2,6 +2,7 @@ package s4.B233316; // Please modify to s4.Bnnnnnn, where nnnnnn is your student
 import java.lang.*;
 import s4.specification.*;
 
+import java.util.Random;
 
 /*package s4.specification;
   ここは、１回、２回と変更のない外部仕様である。
@@ -27,6 +28,8 @@ public class Frequencer implements FrequencerInterface{
     boolean spaceReady = false;
 
     int []  suffixArray; // Suffix Arrayの実装に使うデータの型をint []とせよ。
+
+    Random rand = new Random();
 
 
     // The variable, "suffixArray" is the sorted array of all suffixes of mySpace.                                    
@@ -124,20 +127,49 @@ public class Frequencer implements FrequencerInterface{
         //   suffixArray[ 2]= 0:CBA
         // のようになるべきである。
         // 
-        // とりあえず選択ソートを実装
-        for (int i = 0; i < space.length - 1; i++) {
-            int min = suffixArray[i];
-            int minIndex = i;
-            for (int j = i + 1; j < space.length; j++) {
-                int result = suffixCompare(min, suffixArray[j]);
-                if (result > 0) {
-                    min = suffixArray[j];
-                    minIndex = j;
-                }
-            }
-            suffixArray[minIndex] = suffixArray[i];
-            suffixArray[i] = min;
+        // TODO:QUICK SORTを実装
+        suffixArrayQuickSort(0, suffixArray.length);
+    }
+
+    // suffix array内の部分配列をクイックソート
+    // begin <= index < end
+    private void suffixArrayQuickSort (int begin, int end) {
+        if (begin < end) {
+            int pivot = suffixArrayPartition(begin, end);
+            suffixArrayQuickSort(begin, pivot);
+            suffixArrayQuickSort(pivot + 1, end);
         }
+    }
+
+    // quick sortのパーティション
+    // begin <= index < end
+    // パーティション後pivotのindexをreturn
+    private int suffixArrayPartition (int begin, int end) {
+        // pivotの決定
+        int r = rand.nextInt(end - begin) + begin;
+        // rと部分配列の最終要素をswap
+        suffixArraySwap(r, end - 1);
+        int i = begin;
+        int pivot = suffixArray[end - 1];
+        for (int j = begin; j < end - 1; j++) {
+            // pivotとjを比較
+            int result = suffixCompare(suffixArray[j], pivot);
+            // pivot以下ならiの示すindexとswap
+            if (result <= 0) {
+                suffixArraySwap(i, j);
+                i++;
+            }
+        }
+        // pivotを大小の境界に配置
+        suffixArraySwap(i, end - 1);
+        return i;
+    }
+
+    // suffix_array内のswap
+    private void suffixArraySwap (int i, int j) {
+        int temp = suffixArray[i];
+        suffixArray[i] = suffixArray[j];
+        suffixArray[j] = temp;
     }
 
     // ここから始まり、指定する範囲までは変更してはならないコードである。
@@ -264,17 +296,35 @@ public class Frequencer implements FrequencerInterface{
         // if target_start_end is "Ho ", it will return 6.                
         //                                                                          
         // ここにコードを記述せよ。                                                
-        // とりあえず愚直に線形探索
-        int len = suffixArray.length;
-        for (int i = 0; i < len; i++) {
-            int result = targetCompare(suffixArray[i], start, end);
-            if (result >= 0) {
-                return i;
+        // binary_searchを実装
+        int l = 0;
+        int r = suffixArray.length;
+        int mid = (l + r) / 2;
+        while (l <= r) {
+            // まず現在のmidを比較
+            int result = targetCompare(suffixArray[mid], start, end);
+            // targetより小さいならlを更新して次
+            if (result < 0) {
+                l = mid + 1;
+            } else {
+                // ひとつ前のsuffixを見て
+                int before = -1;
+                if (mid > 0) {
+                    before = targetCompare(suffixArray[mid - 1], start, end);
+                }
+                // それがtargetよりも小さい
+                // すなわち今指しているmidは境界だから
+                if (before < 0) {
+                    // return mid;
+                    break;
+                } else {
+                    // そうでなければrを更新
+                    r = mid - 1;
+                }
             }
+            mid = (l + r) / 2;
         }
-        // suffix がすべて target_j_k より小さいならsuffixArrayの長さを返す
-        return len;
-        // return suffixArray.length; //このコードは変更しなければならない。          
+        return mid;
     }
 
     private int subByteEndIndex(int start, int end) {
@@ -305,16 +355,35 @@ public class Frequencer implements FrequencerInterface{
         // if target_start_end is"i", it will return 9 for "Hi Ho Hi Ho".    
         //                                                                   
         //　ここにコードを記述せよ
-        // とりあえず愚直に線形探索
+        // binary_searchを実装
         int len = suffixArray.length;
-        for (int i = len - 1; i >= 0; i--) {
-            int result = targetCompare(suffixArray[i], start, end);
-            if (result <= 0) {
-                return i + 1;
+        int l = 0;
+        int r = len;
+        int mid = (l + r) / 2;
+        while (l <= r) {
+            // まず現在のmidを比較
+            int result = targetCompare(suffixArray[mid], start, end);
+            // targetより大きいならrを更新して次
+            if (result > 0) {
+                r = mid - 1;
+            } else {
+                // ひとつ後のsuffixを見て
+                int next = 1;
+                if (mid < len - 1) {
+                    next = targetCompare(suffixArray[mid + 1], start, end);
+                }
+                // それがtargetよりも大きい
+                // すなわち今指しているmidは境界だから
+                if (next > 0) {
+                    return mid + 1;
+                } else {
+                    // そうでなければlを更新
+                    l = mid + 1;
+                }
             }
+            mid = (l + r) / 2;
         }
-        // suffix がすべて target_j_k より大きいなら 0 を返す
-        return 0; //このコードは変更しなければならない。return suffixArray.length; // この行は変更しなければならない、       
+        return mid;
     }
 
 

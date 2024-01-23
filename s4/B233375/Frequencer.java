@@ -104,6 +104,7 @@ public class Frequencer implements FrequencerInterface {
         spaceLength = mySpace.length;
         if (spaceLength > 0)
             spaceReady = true;
+
         // First, create unsorted suffix array.
         suffixArray = new int[spaceLength];
         // put all suffixes in suffixArray.
@@ -127,23 +128,70 @@ public class Frequencer implements FrequencerInterface {
         // suffixArray[ 2]= 0:CBA
         // のようになるべきである。
 
-        // sort by バブルソート
-        boolean search_done = true;
-        int cnt;
-        do {// 辞書順は広義単調増加(1が出ないようにする)
-            search_done = true;
-            for (int i = 0; i < spaceLength - 1; i++) {
-                if (suffixCompare(suffixArray[i], suffixArray[i + 1]) == 1) {
-                    search_done = false;
-                    // swap
-                    cnt = suffixArray[i];
-                    suffixArray[i] = suffixArray[i + 1];
-                    suffixArray[i + 1] = cnt;
-                }
-            }
-        } while (search_done == false);
+        // sort by マージソート
+        /// 辞書順は広義単調増加(1が出ないようにする)
+        MargeSort(0, spaceLength);
     }
 
+    /**
+     * 半開区間[left,right)をマージソートでマージを行う
+     */
+    private void MargeSort(int left, int right) {
+        if (left + 1 >= right) {// 幅が1以下
+            return;
+        }
+        if (left + 2 == right) {// 幅が2
+            if (suffixCompare(left, left + 1) == 1) {// swap
+                int tmpValue1 = suffixArray[left];
+                int tmpValue2 = suffixArray[left + 1];
+                suffixArray[left] = tmpValue2;
+                suffixArray[left + 1] = tmpValue1;
+            }
+            return;
+        }
+        int length = right - left;
+        int halfLength = length / 2;
+        int middle = left + halfLength;
+
+        MargeSort(left, middle);// 前半
+        MargeSort(middle, right);// 後半
+
+        // 一旦退避
+        int tmp[] = new int[length];
+        int count = 0;
+        for (int i = left; i < right; ++i) {
+            tmp[count++] = this.suffixArray[i];
+        }
+
+        int leftAt = 0, rightAt = halfLength;
+        count = left;
+
+        while (leftAt < halfLength && rightAt < length) {
+
+            if (suffixCompare(tmp[leftAt], tmp[rightAt]) == 1) {
+                suffixArray[count] = tmp[rightAt++];
+                tmp[rightAt - 1] = -1;
+            } else {
+                suffixArray[count] = tmp[leftAt++];
+                tmp[leftAt - 1] = -1;
+            }
+            ++count;
+        }
+        while (leftAt < halfLength) {
+
+            suffixArray[count] = tmp[leftAt++];
+
+            tmp[leftAt - 1] = -1;
+            ++count;
+        }
+        while (rightAt < length) {
+            suffixArray[count] = tmp[rightAt++];
+
+            ++count;
+            tmp[rightAt - 1] = -1;
+        }
+
+    }
     // ここから始まり、指定する範囲までは変更してはならないコードである。
 
     public void setTarget(byte[] target) {
@@ -279,11 +327,31 @@ public class Frequencer implements FrequencerInterface {
         //
         // ここにコードを記述せよ。
         //
-        int res;
-        for (res = 0; res < spaceLength && (targetCompare(res, start, end) == -1); ++res) {
-
+        // int res; for (res = 0; res < spaceLength && (targetCompare(res, start, end)
+        // == -1); ++res) { }
+        // 範囲が1以下のときは左端を返す
+      
+        int left = 0, right = spaceLength, middle;
+        if (right - left <= 0) {
+            return left;
         }
-        return res; // このコードは変更しなければならない。
+        if (targetCompare(left, start, end) != -1) {// 右端は明らかに対象よりも後に来るので、左端が対象よりも先に来ることを確認
+            return left;// もし、対象と同じか、その後に来るなら、全部対象の後に来ることが分かるので、左端を返す
+        }
+
+        int comp;
+        do {
+            // 左端は対象よりも前に、右端は対象と同じか後ろに来るように持つ
+            middle = left + (right - left) / 2;
+            comp = targetCompare(middle, start, end);
+            if (comp == -1) {// 中央が対象より先に来るか、後に来るかで場合分け
+                left = middle;
+            } else {
+                right = middle;
+            }
+
+        } while (right - left >= 2);// 幅が最小になるまで繰り返す
+        return right; // 右端は対象と同じかその後に来る
     }
 
     private int subByteEndIndex(int start, int end) {
@@ -314,11 +382,29 @@ public class Frequencer implements FrequencerInterface {
         // Assuming the suffix array is created from "Hi Ho Hi Ho",
         // if target_start_end is"i", it will return 9 for "Hi Ho Hi Ho".
         //
-        int res;
-        for (res = spaceLength - 1; res >= 0 && (targetCompare(res, start, end) == 1); --res) {
-
+        // int res; for (res = spaceLength - 1; res >= 0 && (targetCompare(res, start,
+        // end) == 1); --res) {}
+    
+        int left = 0, right = spaceLength, middle;
+        if (right - left <= 0) {
+            return left;
         }
-        return res + 1; // このコードは変更しなければならない。
+        if (targetCompare(left, start, end) == 1) {// 右端は明らかに対象の後に来るので、左端が対象と同じかその前に来ることを確認する
+            return left;// もし対象の後に後にくるならば、すべてが対象の後ろに来ることが明らかなので左端を返す
+        }
+        int comp;
+        do {
+            // 左端は対象と同じかより前に来るように、右端は対象の後ろに来るように持っておく
+            middle = left + (right - left) / 2;
+            comp = targetCompare(middle, start, end);
+            if (comp == 1) {
+                right = middle;
+            } else {
+                left = middle;
+            }
+
+        } while (right - left >= 2);// 幅が最小になるまで繰り返す
+        return right; // 右端は対象よりも後に来るはず
     }
 
     // Suffix Arrayを使ったプログラムのホワイトテストは、
@@ -416,7 +502,7 @@ public class Frequencer implements FrequencerInterface {
             }
             // 2文字でのテスト
             frequencerObject.setSpace("Hi Ho Hi Ho".getBytes());
-            System.out.println("space length:"+frequencerObject.mySpace.length);
+            System.out.println("space length:" + frequencerObject.mySpace.length);
             frequencerObject.printSuffixArray();
             frequencerObject.setTarget("Hi".getBytes());
             result = frequencerObject.frequency();
@@ -425,7 +511,7 @@ public class Frequencer implements FrequencerInterface {
             if (except_value == result) {
                 System.out.println("OK");
             } else {
-                System.out.println("WRONG ,value="+result);
+                System.out.println("WRONG ,value=" + result);
             }
             // 探索地点が終点を超えるときのテスト
             frequencerObject.setTarget("z".getBytes());

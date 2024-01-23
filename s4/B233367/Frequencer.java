@@ -114,7 +114,7 @@ public class Frequencer implements FrequencerInterface{
         //   suffixArray[ 1]= 1:BA
         //   suffixArray[ 2]= 0:CBA
         // のようになるべきである。
-
+/*
         for(int i = 0; i < suffixArray.length - 1; ++i) {
             for(int j = suffixArray.length - 1; j > i; --j) {
                 if(suffixCompare(suffixArray[j - 1], suffixArray[j]) == 1) {
@@ -124,6 +124,47 @@ public class Frequencer implements FrequencerInterface{
                 }
             }
         }
+*/
+
+        // bubbleSort();
+        quickSort();
+    }
+
+    private void bubbleSort() {
+        for(int i = 0; i < suffixArray.length - 1; ++i) {
+            for(int j = suffixArray.length - 1; j > i; --j) {
+                if(suffixCompare(suffixArray[j - 1], suffixArray[j]) == 1) {
+                    int tmp = suffixArray[j - 1];
+                    suffixArray[j - 1] = suffixArray[j];
+                    suffixArray[j] = tmp;
+                }
+            }
+        }
+    }
+
+    private void quickSort() {
+        quickSort2(0, suffixArray.length - 1);
+    }
+
+    private void quickSort2(int left, int right) {
+        if(right - left < 1) return;
+
+        int pivot = suffixArray[left];
+        int l = left + 1;
+        int r = right;
+        while(l <= r) {
+            for(; l <= right && suffixCompare(suffixArray[l], pivot) < 0; ++l);
+            for(; r > left && suffixCompare(suffixArray[r], pivot) >= 0; --r);
+            if(l > r) break;
+            int tmp = suffixArray[l];
+            suffixArray[l] = suffixArray[r];
+            suffixArray[r] = tmp;
+        }
+        int tmp = suffixArray[left];
+        suffixArray[left] = suffixArray[r];
+        suffixArray[r] = tmp;
+        quickSort2(left, r - 1);
+        quickSort2(r + 1, right);
     }
 
     // ここから始まり、指定する範囲までは変更してはならないコードである。
@@ -248,19 +289,11 @@ public class Frequencer implements FrequencerInterface{
         // ここにコードを記述せよ。                                                 
         //                                                                         
 
-        int i;
-/*
-        for(i = 0; i < suffixArray.length; ++i){
-            if(targetCompare(suffixArray[i], start, end) == 0) return i;
-        }
-*/
         int left = -1;
         int right = suffixArray.length;
-        int mid = (left + right) / 2;
 
         while(right - left > 1) {
-            mid = (left + right) / 2;
-
+            int mid = (left + right) / 2;
             if(targetCompare(suffixArray[mid], start, end) >= 0) {
                 right = mid;
             }
@@ -304,11 +337,9 @@ public class Frequencer implements FrequencerInterface{
 
         int left = -1;
         int right = suffixArray.length;
-        int mid = (left + right) / 2;
 
         while(right - left > 1) {
-            mid = (left + right) / 2;
-
+            int mid = (left + right) / 2;
             if(targetCompare(suffixArray[mid], start, end) > 0) {
                 right = mid;
             }

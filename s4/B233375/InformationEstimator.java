@@ -17,7 +17,9 @@ public interface InformationEstimatorInterface {
 
 public class InformationEstimator implements InformationEstimatorInterface {
     static boolean debugMode = false;
-    // Code to test, *warning: This code is slow, and it lacks the required test
+    // Code to tet, *warning: This code condtains intentional problem*
+    boolean targetReady = false;
+    boolean spaceReady = false;
     byte[] myTarget; // data to compute its information quantity
     byte[] mySpace; // Sample space to compute the probability
     FrequencerInterface myFrequencer; // Object for counting frequency
@@ -46,104 +48,119 @@ public class InformationEstimator implements InformationEstimatorInterface {
     }
 
     // f: information quantity for a count, -log2(count/sizeof(space))
-    double f(int freq) {
+    double iq(int freq) {
         return -Math.log10((double) freq / (double) mySpace.length) / Math.log10((double) 2.0);
     }
 
-    @Override
     public void setTarget(byte[] target) {
         myTarget = target;
+        if (target.length > 0)
+            targetReady = true;
     }
 
-    @Override
     public void setSpace(byte[] space) {
         myFrequencer = new Frequencer();
         mySpace = space;
         myFrequencer.setSpace(space);
+        spaceReady = true;
     }
 
-    @Override
     public double estimation() {
-        // targetが設定されているかかつ、その長さが1以上か確認する
-        if (Objects.isNull(myTarget) || myTarget.length == 0) {
-            return 0.0;
-        }
-        // spaceが設定されているか確認する
-        if (Objects.isNull(mySpace)) {
+
+        if (targetReady == false)
+            return (double) 0.0;
+        if (spaceReady == false)
             return Double.MAX_VALUE;
-        }
-        // It returns Double.MAX_VALUE, when the true value is infinite
+        if (myTarget.length == 0) {
+            System.err.println("reach length = 0");
+            return (double) 0.0; // Is it needed?
 
-        boolean[] partition = new boolean[myTarget.length + 1];
-        int np = 1 << (myTarget.length - 1);
-        double value = Double.MAX_VALUE; // value = minimum of each "value1".
-        if (debugMode) {
-            showVariables();
         }
-        if (debugMode) {
-            System.out.printf("np=%d length=%d ", np, +myTarget.length);
+        myFrequencer.setTarget(myTarget);
+
+        double[] suffixEstimation = new double[myTarget.length + 1];
+        // suffixEstimation[i] -> myTarget[i,length)をtargetとしたときに情報量を最小限に分割したときの最小値
+        // init : suffixEstimation[length]= 0 (targetが空のときは情報量が0となる)
+        // trans: suffixEstimation[i] = min(j=i to length)(suffixEstimation[j] + iq[i,j)
+        // )
+        // find : suffixEstimation[0]
+
+        for (int i = 0; i < myTarget.length; i++) {
+            suffixEstimation[i] = Double.MAX_VALUE;
         }
 
-        for (int p = 0; p < np; p++) { // There are 2^(n-1) kinds of partitions.
-            // binary representation of p forms partition.
-            // for partition {"ab" "cde" "fg"}
-            // a b c d e f g : myTarget
-            // T F T F F T F T : partition:
-            partition[0] = true; // I know that this is not needed, but..
-            for (int i = 0; i < myTarget.length - 1; i++) {// パターンを配列に落とし込む
-                partition[i + 1] = (0 != ((1 << i) & p));
-            }
-            partition[myTarget.length] = true;
+        suffixEstimation[myTarget.length] = (double) 0.0; // IE("") = 0.0; shortest suffix of target
 
-            // Compute Information Quantity for the partition, in "value1"
-            // value1 = f(#"ab")+f(#"cde")+f(#"fg") for the above example
-            double value1 = (double) 0.0;
-            int end = 0;
-            int start = end;
-            while (start < myTarget.length) {
-                // System.out.write(myTarget[end]);
-                end++;
-                ;
-                while (partition[end] == false) {
-                    // System.out.write(myTarget[end]);
-                    end++;
-                }
-                // System.out.print("("+start+","+end+")");
-                myFrequencer.setTarget(subBytes(myTarget, start, end));
-                int freq = myFrequencer.frequency();
-                if (freq == 0) {// 情報量はinfになる
+        for (int n = myTarget.length - 1; n >= 0; n--) {
+            // target = "abcdef..", n = 4 for example, subByte(0, 4) = "abcd",
+            // IE("abcd") = min( iq(#a)+IE("bcd"),
+            // iq(#ab)+IE("cd"),
+            // iq(#abc)+IE("d"),
+            // iq(#abcd))+IE("") )
+            // suffixEstimation[4] = IE(""), subByte(0,4) = "abcd",
+            // suffixEstimation[3] = IE("d"); subByte(0,3)= "abc",
+            // suffixEstimation[2] = IE("cd"); subByte(0,2)= "ab",
+            // suffixEstimation[1] = IE("bcd"); subByte(0,1)= "a",
+            // suffixEstimation[0] = IE("abcd");
+            //
+            double value = Double.MAX_VALUE; // for suffixEstimation[n]
+            double value1 = Double.MAX_VALUE; // for candidate of suffixEstimation[n]
+            int start = n;
+            for (int end = n + 1; end <= myTarget.length; end++) {
+                int freq = myFrequencer.subByteFrequency(start, end);
+                if (freq == 0) {
                     return Double.MAX_VALUE;
                 }
-                value1 = value1 + f(freq);
-                // it should --> value1 = value1 + f(myFrequencer.subByteFrequency(start, end)
-                // note that subByteFrequency is not work for B233375 version.
-                start = end;
+
+                // You should compute value1 here, (example is iq(#ab)+IE("cd") above),
+                // using this freq and apropriate SuffixEstimation[somewhere].
+                value1 = iq(freq) + suffixEstimation[end];
+                if (value > value1)
+                    value = value1; // compute minimum of value1,
             }
-            // System.out.println(" "+ value1);
+            if (debugMode) {
+                System.out.println("suffixEstimation[" + n + "] = " + value);
+            }
+            suffixEstimation[n] = value;
+        }
+        return suffixEstimation[0];
 
-            // Get the minimal value in "value"
-            if (value1 < value)
-                value = value1;
-        }
-        if (debugMode) {
-            System.out.printf("%10.5f\n", value);
-        }
-        return value;
     }
-
     public static void main(String[] args) {
         InformationEstimator myObject;
         double value;
         debugMode = true;
+        double eps = 0.0001;
         myObject = new InformationEstimator();
         myObject.setSpace("3210321001230123".getBytes());
         myObject.setTarget("0".getBytes());
         value = myObject.estimation();
+        if (Math.abs(value - 2) <= eps) {
+            System.out.println("AC");
+        } else {
+            System.err.println("WA value: " + value);
+        }
+
         myObject.setTarget("01".getBytes());
         value = myObject.estimation();
+        if (Math.abs(value - 3) <= eps) {
+            System.out.println("AC");
+        } else {
+            System.err.println("WA value: " + value);
+        }
         myObject.setTarget("0123".getBytes());
         value = myObject.estimation();
+        if (Math.abs(value - 3) <= eps) {
+            System.out.println("AC");
+        } else {
+            System.err.println("WA value: " + value);
+        }
         myObject.setTarget("00".getBytes());
         value = myObject.estimation();
+        if (Math.abs(value - 4) <= eps) {
+            System.out.println("AC");
+        } else {
+            System.err.println("WA value: " + value);
+        }
     }
 }

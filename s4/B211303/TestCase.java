@@ -44,11 +44,41 @@ public class TestCase {
 	    myObject.setTarget("H".getBytes());
 	    freq = myObject.frequency();
 	    assert freq == 4: "Hi Ho Hi Ho, H: " + freq;
-	    // Write your testCase here
-	    myObject.setSpace("abc".getBytes());
-	    myObject.setTarget("abcd".getBytes());
-  	    freq = myObject.frequency();
-
+	    		// ArrayIndexOutOfBoundsを起こさない
+		myObject = new Frequencer();
+		myObject.setSpace("Hi".getBytes());
+		myObject.setTarget("Hello".getBytes());
+		// should be returnd 0...
+		freq = myObject.frequency();
+		assert freq == 0 : "Hi, Hello: " + freq;
+		// AAAAに対してAAが3回含まれる
+		myObject = new Frequencer();
+		myObject.setSpace("AAAA".getBytes());
+		myObject.setTarget("AA".getBytes());
+		freq = myObject.frequency();
+		assert freq == 3 : "AAAA, AA: " + freq;
+		// Targetがsetされていない
+		myObject = new Frequencer();
+	    myObject.setSpace("Hi Ho Hi Ho".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == -1: "Hi Ho Hi Ho, : " + freq;
+		// Targetの長さが0
+		myObject = new Frequencer();
+	    myObject.setSpace("Hi Ho Hi Ho".getBytes());
+		myObject.setTarget("".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == -1: "Hi Ho Hi Ho, \"\": " + freq;
+		// Spaceがsetされていない
+		myObject = new Frequencer();
+		myObject.setTarget("Hi".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == 0: ", Hi: " + freq;
+		// Spaceの長さが0
+		myObject = new Frequencer();
+	    myObject.setSpace("".getBytes());
+		myObject.setTarget("Hi".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == 0: "\"\", Hi: " + freq;
 	/*    myObject = new Frequencer();
 	    freq = myObject.frequency();
 	    assert freq == -1: "new object == -1";
