@@ -1,6 +1,7 @@
 package s4.B233322; // Please modify to s4.Bnnnnnn, where nnnnnn is your student ID. 
 import java.lang.*;
 import s4.specification.*;
+import s4.slow.*;
 
 /*
 interface FrequencerInterface {     // This interface provides the design for frequency counter.
@@ -31,6 +32,18 @@ public interface InformationEstimatorInterface{
 
 public class TestCase {
     static boolean success = true;
+
+    private static void frequencer_valid_case_test(String space, String target) {
+	FrequencerInterface myObject = new s4.B233322.Frequencer();
+	FrequencerInterface slowObject = new s4.slow.Frequencer();
+        myObject.setSpace(space.getBytes());
+        slowObject.setSpace(space.getBytes());
+        myObject.setTarget(target.getBytes());
+        slowObject.setTarget(target.getBytes());
+	int correct_freq = slowObject.frequency();
+	int freq = myObject.frequency();
+	assert correct_freq == freq : "frequencer test failed: space is " + space + ", target is " + target + ", so return value must be " + correct_freq + ", but it was " + freq + ".";
+    }
 
     public static void main(String[] args) {
 	try {
@@ -73,36 +86,18 @@ public class TestCase {
             assert freq == 0 : "test failed: when space length is zero, return value must be 0. but return value is " + freq + ".";
         
             // Test case 5: valid case
-            myObject = new Frequencer();
-            myObject.setSpace("Hi Ho Hi Ho".getBytes());
-            myObject.setTarget("H".getBytes());
-            freq = myObject.frequency();
-            assert freq == 4 : "test failed: space is \"Hi Ho Hi Ho\", target is \"H\", return value must be 4, but it is " + freq + ".";
-        
-            // Test case 6: valid case
-            myObject = new Frequencer();
-            myObject.setSpace("Hi Ho Hi Ho".getBytes());
-            myObject.setTarget("X".getBytes());
-            freq = myObject.frequency();
-            assert freq == 0 : "test failed: space is \"Hi Ho Hi Ho\", target is \"X\", return value must be 0, but it is " + freq + ".";
-        
-
-            //detect the problem(week2 - step6)
-            try
-            {
-                // Test case 7: valid case
-                myObject = new Frequencer();
-                myObject.setSpace("Hi Ho Hi Ho".getBytes());
-                myObject.setTarget("Hi".getBytes());
-                freq = myObject.frequency();
-                System.out.println("test case 7: success!");
-                assert freq == 2 : "test failed: space is \"Hi Ho Hi Ho\", target is \"Hi\", return value must be 2, but it is " + freq + ".";
-            }
-            catch (Exception e)
-            {
-                System.out.println("test case 7: problem remain!");
-                e.printStackTrace();
-            }
+            frequencer_valid_case_test("Hi Ho Hi Ho", "H");
+            frequencer_valid_case_test("Hi Ho Hi Ho", "X");
+            frequencer_valid_case_test("Hi Ho Hi Ho", "Hi");
+            frequencer_valid_case_test("H", "H");
+            frequencer_valid_case_test("H", "Ha");
+            frequencer_valid_case_test("aaaaaaaaaa", "a");
+            frequencer_valid_case_test("aaaaaaaaaa", "aa");
+            frequencer_valid_case_test("aaaaaaaaaa", "aaa");
+            frequencer_valid_case_test("As", "H");
+            frequencer_valid_case_test("Zip", "H");
+            frequencer_valid_case_test("A", "Hi");
+            frequencer_valid_case_test("Z", "Hi");
 	}
 	catch(Exception e) {
 	    System.out.println("Exception occurred in Frequencer Object");

@@ -57,6 +57,9 @@ public class InformationEstimator implements InformationEstimatorInterface {
 
     @Override
     public double estimation(){
+        return estimation2();
+    }
+    public double estimation1(){
         // It returns Double.MAX_VALUE, when the true value is infinite, or space is not set.
         if(myTarget == null || myTarget.length == 0) return 0.0;
         if(mySpace == null) return Double.MAX_VALUE;
@@ -110,6 +113,63 @@ public class InformationEstimator implements InformationEstimatorInterface {
 	if(debugMode) { System.out.printf("%10.5f\n", value); }
         return value;
     }
+
+    public double estimation2(){
+        // It returns Double.MAX_VALUE, when the true value is infinite, or space is not set.
+        if(myTarget == null || myTarget.length == 0) return 0.0;
+        if(mySpace == null) return Double.MAX_VALUE;
+
+        double[] values = new double[valueNum()];
+        for(int i = 0; i < values.length; ++i) {
+            values[i] = Double.MAX_VALUE;
+        }
+
+        double value = iq(0, myTarget.length, values);
+
+	if(debugMode) { System.out.printf("%10.5f\n", value); }
+        return value;
+    }
+
+    private int valueNum() {
+        int n = 0;
+        for(int i = 1; i <= myTarget.length; ++i) {
+            n += i;
+        }
+        return n;
+    }
+
+    private double iq(int start, int end, double[] values) {
+        if(start == end) return 0.0;
+
+        int length = end - start;
+        int l = myTarget.length - length;
+        int index = l * (l + 1) / 2 + start;
+        if(values[index] != Double.MAX_VALUE) return values[index];
+
+        double minValue = Double.MAX_VALUE;
+        for(int i = 0; i < length; ++i) {
+            double value = iq(start, start + i, values);
+            int freq = myFrequencer.subByteFrequency(start + i, end);
+            if(freq == 0){
+                value = Double.MAX_VALUE;
+                break;
+            }
+            if(freq < 0) return 0.0;
+            value += f(freq);
+
+            if(value < minValue) minValue = value;
+        }
+        values[index] = minValue;
+/*
+for(int i = 0; i < values.length; ++i) {
+    if(values[i] == Double.MAX_VALUE) System.out.print("MAX ");
+    else System.out.printf("%.3f ", values[i]);
+}
+System.out.println();
+*/
+        return minValue;
+    }
+
 
     public static void main(String[] args) {
         InformationEstimator myObject;
