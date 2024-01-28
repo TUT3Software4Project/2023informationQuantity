@@ -280,12 +280,26 @@ public class Frequencer implements FrequencerInterface{
         // Assuming the suffix array is created from "Hi Ho Hi Ho",                 
         // if target_start_end is "Ho ", it will return 6.                
         //                                                                          
-        // ここにコードを記述せよ。                                                 
+        // ここにコードを記述せよ。        
+	/*
 	for (int i=0; i < this.mySpace.length; ++i)
 	{
             if (targetCompare(this.suffixArray[i], start, end) >= 0) { return i; }
 	}
         return suffixArray.length;
+	*/
+
+	int left = 0;
+	int right = this.mySpace.length;
+	int half;
+	while (true)
+	{
+	    if (right - left == 1) { break; }
+	    half = (left + right) / 2;
+	    if (targetCompare(this.suffixArray[half], start, end) < 0) { left = half; }
+	    else { right = half; }
+	}
+	return (targetCompare(this.suffixArray[left], start, end) < 0) ? left+1 : left;
     }
 
     private int subByteEndIndex(int start, int end) {
@@ -316,11 +330,18 @@ public class Frequencer implements FrequencerInterface{
         // if target_start_end is"i", it will return 9 for "Hi Ho Hi Ho".    
         //                                                                   
         //　ここにコードを記述せよ                                           
-        for (int i=0; i < this.mySpace.length; ++i)
+	
+	int left = 0;
+	int right = this.mySpace.length;
+	int half;
+	while (true)
 	{
-            if (targetCompare(this.suffixArray[i], start, end) > 0) { return i; }
+	    if (right - left == 1) { break; }
+	    half = (left + right) / 2;
+	    if (targetCompare(this.suffixArray[half], start, end) <= 0) { left = half; }
+	    else { right = half; }
 	}
-        return suffixArray.length;
+	return (targetCompare(this.suffixArray[left], start, end) <= 0) ? left+1 : left;
     }
 
 

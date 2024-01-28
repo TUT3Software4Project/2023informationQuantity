@@ -298,7 +298,7 @@ public class Frequencer implements FrequencerInterface{
         // ここにコードを記述せよ。                                                
         // binary_searchを実装
         int l = 0;
-        int r = suffixArray.length;
+        int r = suffixArray.length - 1;
         int mid = (l + r) / 2;
         while (l <= r) {
             // まず現在のmidを比較
@@ -358,7 +358,7 @@ public class Frequencer implements FrequencerInterface{
         // binary_searchを実装
         int len = suffixArray.length;
         int l = 0;
-        int r = len;
+        int r = len - 1;
         int mid = (l + r) / 2;
         while (l <= r) {
             // まず現在のmidを比較
