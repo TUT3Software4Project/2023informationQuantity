@@ -301,6 +301,7 @@ public class Frequencer implements FrequencerInterface{
         int r = suffixArray.length - 1;
         int mid = (l + r) / 2;
         while (l <= r) {
+            mid = (l + r) / 2;
             // まず現在のmidを比較
             int result = targetCompare(suffixArray[mid], start, end);
             // targetより小さいならlを更新して次
@@ -315,16 +316,14 @@ public class Frequencer implements FrequencerInterface{
                 // それがtargetよりも小さい
                 // すなわち今指しているmidは境界だから
                 if (before < 0) {
-                    // return mid;
-                    break;
+                    return mid;
                 } else {
                     // そうでなければrを更新
                     r = mid - 1;
                 }
             }
-            mid = (l + r) / 2;
         }
-        return mid;
+        return mid + 1;
     }
 
     private int subByteEndIndex(int start, int end) {
@@ -361,6 +360,7 @@ public class Frequencer implements FrequencerInterface{
         int r = len - 1;
         int mid = (l + r) / 2;
         while (l <= r) {
+            mid = (l + r) / 2;
             // まず現在のmidを比較
             int result = targetCompare(suffixArray[mid], start, end);
             // targetより大きいならrを更新して次
@@ -381,7 +381,6 @@ public class Frequencer implements FrequencerInterface{
                     l = mid + 1;
                 }
             }
-            mid = (l + r) / 2;
         }
         return mid;
     }
@@ -410,6 +409,16 @@ public class Frequencer implements FrequencerInterface{
             frequencerObject.setSpace("HHH".getBytes());
             frequencerObject.printSuffixArray();
             frequencerObject = new Frequencer();
+            frequencerObject.setSpace("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".getBytes());
+            frequencerObject.setTarget("B".getBytes());
+            System.out.println(frequencerObject.frequency());
+            System.out.println(frequencerObject.subByteStartIndex(0, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".length()));
+            System.out.println(frequencerObject.subByteEndIndex(0, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".length()));
+            frequencerObject.setTarget("0".getBytes());
+            System.out.println(frequencerObject.subByteStartIndex(0, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".length()));
+            System.out.println(frequencerObject.subByteEndIndex(0, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".length()));
+            frequencerObject.printSuffixArray();
+            frequencerObject = new Frequencer();
             frequencerObject.setSpace("Hi Ho Hi Ho".getBytes());
             frequencerObject.printSuffixArray();
             /* Example from "Hi Ho Hi Ho"    
@@ -430,7 +439,6 @@ public class Frequencer implements FrequencerInterface{
             //                                         
             // ****  Please write code to check subByteStartIndex, and subByteEndIndex
             //
-
             int result = frequencerObject.frequency();
             System.out.print("Freq = "+ result+" ");
             if(4 == result) { System.out.println("OK"); } else {System.out.println("WRONG"); }

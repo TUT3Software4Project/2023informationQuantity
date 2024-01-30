@@ -170,6 +170,8 @@ public interface InformationEstimatorInterface {
 public class InformationEstimator implements InformationEstimatorInterface {
     static boolean debugMode = false;
     // Code to test, *warning: This code is slow, and it lacks the required test
+    boolean targetReady = false;
+    boolean spaceReady = false;
     byte[] myTarget; // data to compute its information quantity
     byte[] mySpace;  // Sample space to compute the probability
     FrequencerInterface myFrequencer;  // Object for counting frequency
@@ -200,20 +202,23 @@ public class InformationEstimator implements InformationEstimatorInterface {
     @Override
     public void setTarget(byte[] target) {
         myTarget = target;
+	if(myTarget.length > 0) targetReady = true;
     }
 
     @Override
     public void setSpace(byte[] space) {
-        myFrequencer = new Frequencer();
-        mySpace = space; myFrequencer.setSpace(space);
+        mySpace = space;
+	myFrequencer = new Frequencer();
+	myFrequencer.setSpace(space);
+        spaceReady = true;
     }
 
     @Override
     public double estimation(){
-	if(myTarget.length == 0){
+	if(targetReady == false){
 		return 0.0;
 	}
-	if(mySpace.length == 0){
+	if(spaceReady == 0){
 		return Double.MAX_VALUE;
 	}
         boolean [] partition = new boolean[myTarget.length+1];
