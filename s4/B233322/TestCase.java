@@ -109,20 +109,69 @@ public class TestCase {
 	    InformationEstimatorInterface myObject;
 	    double value;
 	    System.out.println("checking InformationEstimator");
-	    myObject = new InformationEstimator();
+	    
+	    // Test case 1: target is not set
+            myObject = new InformationEstimator();
+            myObject.setSpace("3210321001230123".getBytes());
+            value = myObject.estimation();
+            assert (value > -0.0001) && (0.0001 > value) : "test failed: when target not set, return value must be 0. but return value is " + value + ".";
+	    
+	    // Test case 2: target'length is zero
+            myObject = new InformationEstimator();
+            myObject.setSpace("3210321001230123".getBytes());
+	    myObject.setTarget("".getBytes());
+            value = myObject.estimation();
+            assert (value > -0.0001) && (0.0001 > value) : "test failed: when target length is zero, return value must be 0. but return value is " + value + ".";
+	    
+	    // Test case 3: space is not set
+            myObject = new InformationEstimator();
+	    myObject.setTarget("0".getBytes());
+            value = myObject.estimation();
+            assert value == Double.MAX_VALUE : "test failed: when space is not set, return value must be " + Double.MAX_VALUE + ". but return value is " + value + ".";
+
+	    /*   the comment does NOT mention the case where space length is zero
+	    // Test case 4: space length is zero
+            myObject = new InformationEstimator();
+	    myObject.setSpace("".getBytes());
+	    myObject.setTarget("0".getBytes());
+            value = myObject.estimation();
+            assert value == Double.MAX_VALUE : "test failed: when space length is zero, return value must be " + Double.MAX_VALUE + ". but return value is " + value + ".";
+	    */
+	    
+	    // Test case 5: true value is infinite
+            myObject = new InformationEstimator();
+	    myObject.setSpace("abc".getBytes());
+	    myObject.setTarget("0".getBytes());
+            value = myObject.estimation();
+            assert value == Double.MAX_VALUE : "test failed: when true value is infinite, return value must be " + Double.MAX_VALUE + ". but return value is " + value + ".";
+	    
+	    // Test case 6: valid case
+            myObject = new InformationEstimator();
 	    myObject.setSpace("3210321001230123".getBytes());
 	    myObject.setTarget("0".getBytes());
-	    value = myObject.estimation();
-	    assert (value > 1.9999) && (2.0001 >value): "IQ for 0 in 3210321001230123 should be 2.0. But it returns "+value;
+            value = myObject.estimation();
+            assert (value > 1.9999) && (2.0001 > value) : "test failed: space is 3210321001230123, target is 0, return value must be 2.0. but return value is " + value + ".";
+	    
+	    // Test case 7: valid case
+            myObject = new InformationEstimator();
+	    myObject.setSpace("3210321001230123".getBytes());
 	    myObject.setTarget("01".getBytes());
-	    value = myObject.estimation();
-	    assert (value > 2.9999) && (3.0001 >value): "IQ for 01 in 3210321001230123 should be 3.0. But it returns "+value;
+            value = myObject.estimation();
+            assert (value > 2.9999) && (3.0001 > value) : "test failed: space is 3210321001230123, target is 01, return value must be 3.0. but return value is " + value + ".";
+	    
+	    // Test case 8: valid case
+            myObject = new InformationEstimator();
+	    myObject.setSpace("3210321001230123".getBytes());
 	    myObject.setTarget("0123".getBytes());
-	    value = myObject.estimation();
-	    assert (value > 2.9999) && (3.0001 >value): "IQ for 0123 in 3210321001230123 should be 3.0. But it returns "+value;
+            value = myObject.estimation();
+            assert (value > 2.9999) && (3.0001 > value) : "test failed: space is 3210321001230123, target is 0123, return value must be 3.0. but return value is " + value + ".";
+	    
+	    // Test case 9: valid case
+            myObject = new InformationEstimator();
+	    myObject.setSpace("3210321001230123".getBytes());
 	    myObject.setTarget("00".getBytes());
-	    value = myObject.estimation();
-	    assert (value > 3.9999) && (4.0001 >value): "IQ for 00 in 3210321001230123 should be 3.0. But it returns "+value;
+            value = myObject.estimation();
+            assert (value > 3.9999) && (4.0001 > value) : "test failed: space is 3210321001230123, target is 00, return value must be 4.0. but return value is " + value + ".";
 	}
 	catch(Exception e) {
 	    System.out.println("Exception occurred in InformationEstimator Object");

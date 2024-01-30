@@ -80,6 +80,12 @@ public class TestCase {
 		myObject.setTarget("Hi".getBytes());
 	    freq = myObject.frequency();
 	    assert freq == 0: "\"\", Hi: " + freq;
+		// binary search test
+	    myObject = new Frequencer();
+	    myObject.setSpace("ABCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD".getBytes());
+	    myObject.setTarget("DA".getBytes());
+	    freq = myObject.frequency();
+	    assert freq == 1: "ABCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD, DA: " + freq;
 	}
 	catch(Exception e) {
 	    System.out.println("Exception occurred in Frequencer Object");

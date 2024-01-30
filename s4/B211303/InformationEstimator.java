@@ -18,11 +18,13 @@ public interface InformationEstimatorInterface {
 
 public class InformationEstimator implements InformationEstimatorInterface {
     static boolean debugMode = false;
+
     // Code to test, *warning: This code is slow, and it lacks the required test
     byte[] myTarget; // data to compute its information quantity
     byte[] mySpace;  // Sample space to compute the probability
     FrequencerInterface myFrequencer;  // Object for counting frequency
-
+    boolean targetReady = false;
+    boolean spaceReady = false;
     private void showVariables() {
 	for(int i=0; i< mySpace.length; i++) { System.out.write(mySpace[i]); }
 	System.out.write(' ');
@@ -40,28 +42,25 @@ public class InformationEstimator implements InformationEstimatorInterface {
 
     // f: information quantity for a count, -log2(count/sizeof(space))
     double f(int freq) {
-	if(freq == 0 || mySpace.length == 0){
-		return 0.0;
-	}
         return  - Math.log10((double) freq / (double) mySpace.length)/ Math.log10((double) 2.0);
     }
 
     @Override
     public void setTarget(byte[] target) {
-        myTarget = target;
+        myTarget = target; if(myTarget.length > 0) targetReady = true;
     }
 
     @Override
     public void setSpace(byte[] space) {
         myFrequencer = new Frequencer();
-        mySpace = space; myFrequencer.setSpace(space);
+        mySpace = space; if(mySpace.length > 0)spaceReady = true;myFrequencer.setSpace(space);
     }
 
     @Override
     public double estimation(){
-	if(myTarget.length == 0) 
+	if(targetReady == false) 
 		return (double)0.0;	
-	if(mySpace.length == 0)
+	if(spaceReady == false)
 		return Double.MAX_VALUE;
         boolean [] partition = new boolean[myTarget.length+1];
         int np = 1<<(myTarget.length-1);
@@ -94,9 +93,10 @@ public class InformationEstimator implements InformationEstimatorInterface {
                 }
                 // System.out.print("("+start+","+end+")");
                 myFrequencer.setTarget(subBytes(myTarget, start, end));
-                value1 = value1 + f(myFrequencer.frequency());
-		// it should  -->   value1 = value1 + f(myFrequencer.subByteFrequency(start, end)
-		// note that subByteFrequency is not work for B211303 version.
+		int freq = myFrequencer.frequency();
+		if(freq == 0) break;
+		if(freq < 0) return (double) 0.0;
+		value1 = value1 + f(freq);
                 start = end;
             }
             // System.out.println(" "+ value1);
