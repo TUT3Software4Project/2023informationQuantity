@@ -114,57 +114,42 @@ public class Frequencer implements FrequencerInterface{
         //   suffixArray[ 1]= 1:BA
         //   suffixArray[ 2]= 0:CBA
         // のようになるべきである。
-/*
-        for(int i = 0; i < suffixArray.length - 1; ++i) {
-            for(int j = suffixArray.length - 1; j > i; --j) {
-                if(suffixCompare(suffixArray[j - 1], suffixArray[j]) == 1) {
-                    int tmp = suffixArray[j - 1];
-                    suffixArray[j - 1] = suffixArray[j];
-                    suffixArray[j] = tmp;
-                }
+
+        suffixSort();
+    }
+
+    private void suffixSort() {
+        mergeSort(0, suffixArray.length - 1);
+    }
+
+    private void mergeSort(int left, int right) {
+        if (right - left <= 0) return;
+
+        int mid = (left + right) / 2;
+
+        mergeSort(left, mid);
+        mergeSort(mid + 1, right);
+
+        int length = right - left + 1;
+        int[] tmp = new int[length];
+        int index = 0;
+
+        int l = left;
+        int r = mid + 1;
+        while (l <= mid && r <= right) {
+            if (suffixCompare(suffixArray[l], suffixArray[r]) < 0) {
+                tmp[index++] = suffixArray[l++];
+            }
+            else {
+                tmp[index++] = suffixArray[r++];
             }
         }
-*/
+        for (; l <= mid; ++l) tmp[index++] = suffixArray[l];
+        for (; r <= right; ++r) tmp[index++] = suffixArray[r];
 
-        // bubbleSort();
-        quickSort();
-    }
-
-    private void bubbleSort() {
-        for(int i = 0; i < suffixArray.length - 1; ++i) {
-            for(int j = suffixArray.length - 1; j > i; --j) {
-                if(suffixCompare(suffixArray[j - 1], suffixArray[j]) == 1) {
-                    int tmp = suffixArray[j - 1];
-                    suffixArray[j - 1] = suffixArray[j];
-                    suffixArray[j] = tmp;
-                }
-            }
+        for(int i = 0; i < tmp.length; ++i) {
+            suffixArray[i + left] = tmp[i];
         }
-    }
-
-    private void quickSort() {
-        quickSort2(0, suffixArray.length - 1);
-    }
-
-    private void quickSort2(int left, int right) {
-        if(right - left < 1) return;
-
-        int pivot = suffixArray[left];
-        int l = left + 1;
-        int r = right;
-        while(l <= r) {
-            for(; l <= right && suffixCompare(suffixArray[l], pivot) < 0; ++l);
-            for(; r > left && suffixCompare(suffixArray[r], pivot) >= 0; --r);
-            if(l > r) break;
-            int tmp = suffixArray[l];
-            suffixArray[l] = suffixArray[r];
-            suffixArray[r] = tmp;
-        }
-        int tmp = suffixArray[left];
-        suffixArray[left] = suffixArray[r];
-        suffixArray[r] = tmp;
-        quickSort2(left, r - 1);
-        quickSort2(r + 1, right);
     }
 
     // ここから始まり、指定する範囲までは変更してはならないコードである。

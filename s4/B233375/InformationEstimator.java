@@ -1,5 +1,6 @@
 package s4.B233375; // Please modify to s4.Bnnnnnn, where nnnnnn is your student ID. 
-import java.util.Objects;
+
+
 import s4.specification.*;
 
 /* What is imported from s4.specification
@@ -17,50 +18,44 @@ public interface InformationEstimatorInterface {
 
 public class InformationEstimator implements InformationEstimatorInterface {
     static boolean debugMode = false;
-    // Code to tet, *warning: This code condtains intentional problem*
     boolean targetReady = false;
     boolean spaceReady = false;
-    byte[] myTarget; // data to compute its information quantity
-    byte[] mySpace; // Sample space to compute the probability
+    private int targetLength;
+    byte[] target; // data to compute its information quantity
+    byte[] space; // Sample space to compute the probability
     FrequencerInterface myFrequencer; // Object for counting frequency
 
     private void showVariables() {
-        for (int i = 0; i < mySpace.length; i++) {
-            System.out.write(mySpace[i]);
+        for (int i = 0; i < space.length; i++) {
+            System.out.write(space[i]);
         }
         System.out.write(' ');
-        for (int i = 0; i < myTarget.length; i++) {
-            System.out.write(myTarget[i]);
+        for (int i = 0; i < targetLength; i++) {
+            System.out.write(target[i]);
         }
         System.out.write(' ');
     }
 
-    byte[] subBytes(byte[] x, int start, int end) {
-        // corresponding to substring of String for byte[],
-        // It is not implement in class library because internal structure of byte[]
-        // requires copy.
-        byte[] result = new byte[end - start];
-        for (int i = 0; i < end - start; i++) {
-            result[i] = x[start + i];
-        }
-        ;
-        return result;
-    }
-
-    // f: information quantity for a count, -log2(count/sizeof(space))
+    /**
+     * 情報量を求める
+     * 
+     * @param freq space中に対象の文字列が現れた回数
+     * @return 情報量 = -log2(freq / space.length)
+     */
     double iq(int freq) {
-        return -Math.log10((double) freq / (double) mySpace.length) / Math.log10((double) 2.0);
+        return -Math.log10((double) freq / (double) space.length) / Math.log10((double) 2.0);
     }
 
     public void setTarget(byte[] target) {
-        myTarget = target;
-        if (target.length > 0)
+        this.target = target;
+        targetLength = target.length;
+        if (targetLength > 0)
             targetReady = true;
     }
 
     public void setSpace(byte[] space) {
         myFrequencer = new Frequencer();
-        mySpace = space;
+        this.space = space;
         myFrequencer.setSpace(space);
         spaceReady = true;
     }
@@ -71,27 +66,24 @@ public class InformationEstimator implements InformationEstimatorInterface {
             return (double) 0.0;
         if (spaceReady == false)
             return Double.MAX_VALUE;
-        if (myTarget.length == 0) {
-            System.err.println("reach length = 0");
+        if (targetLength == 0) {
             return (double) 0.0; // Is it needed?
-
         }
-        myFrequencer.setTarget(myTarget);
+        myFrequencer.setTarget(target);
 
-        double[] suffixEstimation = new double[myTarget.length + 1];
         // suffixEstimation[i] -> myTarget[i,length)をtargetとしたときに情報量を最小限に分割したときの最小値
         // init : suffixEstimation[length]= 0 (targetが空のときは情報量が0となる)
-        // trans: suffixEstimation[i] = min(j=i to length)(suffixEstimation[j] + iq[i,j)
-        // )
+        // trans: suffixEstimation[i] = min(j=i to length)(suffixEstimation[j] +iq[i,j))
         // find : suffixEstimation[0]
+        double[] suffixEstimation = new double[targetLength + 1];
 
-        for (int i = 0; i < myTarget.length; i++) {
+        for (int i = 0; i < targetLength; i++) {
             suffixEstimation[i] = Double.MAX_VALUE;
         }
 
-        suffixEstimation[myTarget.length] = (double) 0.0; // IE("") = 0.0; shortest suffix of target
+        suffixEstimation[targetLength] = (double) 0.0;// 空文字列の情報量
 
-        for (int n = myTarget.length - 1; n >= 0; n--) {
+        for (int n = targetLength - 1; n >= 0; n--) {
             // target = "abcdef..", n = 4 for example, subByte(0, 4) = "abcd",
             // IE("abcd") = min( iq(#a)+IE("bcd"),
             // iq(#ab)+IE("cd"),
@@ -103,64 +95,55 @@ public class InformationEstimator implements InformationEstimatorInterface {
             // suffixEstimation[1] = IE("bcd"); subByte(0,1)= "a",
             // suffixEstimation[0] = IE("abcd");
             //
-            double value = Double.MAX_VALUE; // for suffixEstimation[n]
-            double value1 = Double.MAX_VALUE; // for candidate of suffixEstimation[n]
+            double value_min = Double.MAX_VALUE; // suffixEstimation[n] の暫定の値
+            double value_candidate = Double.MAX_VALUE; // suffixEstimation[n]の候補値
             int start = n;
-            for (int end = n + 1; end <= myTarget.length; end++) {
+            for (int end = n + 1; end <= targetLength; end++) {
                 int freq = myFrequencer.subByteFrequency(start, end);
-                if (freq == 0) {
+                if (freq == 0) {// この時点で他の値もMAX_VALUEになるはず
                     return Double.MAX_VALUE;
                 }
-
-                // You should compute value1 here, (example is iq(#ab)+IE("cd") above),
-                // using this freq and apropriate SuffixEstimation[somewhere].
-                value1 = iq(freq) + suffixEstimation[end];
-                if (value > value1)
-                    value = value1; // compute minimum of value1,
+                value_candidate = iq(freq) + suffixEstimation[end];
+                if (value_min > value_candidate)
+                    value_min = value_candidate; // compute minimum of value1,
             }
             if (debugMode) {
-                System.out.println("suffixEstimation[" + n + "] = " + value);
+                System.out.println("suffixEstimation[" + n + "] = " + value_min);
             }
-            suffixEstimation[n] = value;
+            suffixEstimation[n] = value_min;
         }
         return suffixEstimation[0];
 
     }
-    public static void main(String[] args) {
-        InformationEstimator myObject;
-        double value;
-        debugMode = true;
-        double eps = 0.0001;
-        myObject = new InformationEstimator();
-        myObject.setSpace("3210321001230123".getBytes());
-        myObject.setTarget("0".getBytes());
-        value = myObject.estimation();
-        if (Math.abs(value - 2) <= eps) {
-            System.out.println("AC");
-        } else {
-            System.err.println("WA value: " + value);
-        }
 
-        myObject.setTarget("01".getBytes());
-        value = myObject.estimation();
-        if (Math.abs(value - 3) <= eps) {
+    /**
+     * InformationEstimatorのテストを行う
+     * 
+     * @param space  入力するspace
+     * @param target 入力するtarget
+     * @param except 予測する値
+     */
+    private static void testInformationEstimation(String space, String target, double except) {
+        double eps = 0.0001;
+        InformationEstimatorInterface tester = new InformationEstimator();
+        tester.setSpace(space.getBytes());
+        tester.setTarget(target.getBytes());
+
+        double value = tester.estimation();
+        if (Math.abs(value - except) <= eps) {
             System.out.println("AC");
         } else {
             System.err.println("WA value: " + value);
         }
-        myObject.setTarget("0123".getBytes());
-        value = myObject.estimation();
-        if (Math.abs(value - 3) <= eps) {
-            System.out.println("AC");
-        } else {
-            System.err.println("WA value: " + value);
-        }
-        myObject.setTarget("00".getBytes());
-        value = myObject.estimation();
-        if (Math.abs(value - 4) <= eps) {
-            System.out.println("AC");
-        } else {
-            System.err.println("WA value: " + value);
-        }
+    }
+
+    public static void main(String[] args) {
+
+        debugMode = true;
+        testInformationEstimation("3210321001230123", "0", 2.0);
+        testInformationEstimation("3210321001230123", "01", 3.0);
+        testInformationEstimation("3210321001230123", "0123", 3.0);
+        testInformationEstimation("3210321001230123", "00", 4.0);
+
     }
 }

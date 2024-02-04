@@ -57,69 +57,11 @@ public class InformationEstimator implements InformationEstimatorInterface {
 
     @Override
     public double estimation(){
-        return estimation2();
-    }
-    public double estimation1(){
         // It returns Double.MAX_VALUE, when the true value is infinite, or space is not set.
         if(myTarget == null || myTarget.length == 0) return 0.0;
         if(mySpace == null) return Double.MAX_VALUE;
 
-        boolean [] partition = new boolean[myTarget.length+1];
-        int np = 1<<(myTarget.length-1);
-        double value = Double.MAX_VALUE; // value = mininimum of each "value1".
-	if(debugMode) { showVariables(); }
-        if(debugMode) { System.out.printf("np=%d length=%d ", np, +myTarget.length); }
-
-        for(int p=0; p<np; p++) { // There are 2^(n-1) kinds of partitions.
-            // binary representation of p forms partition.
-            // for partition {"ab" "cde" "fg"}
-            // a b c d e f g   : myTarget
-            // T F T F F T F T : partition:
-            partition[0] = true; // I know that this is not needed, but..
-            for(int i=0; i<myTarget.length -1;i++) {
-                partition[i+1] = (0 !=((1<<i) & p));
-            }
-            partition[myTarget.length] = true;
-
-            // Compute Information Quantity for the partition, in "value1"
-            // value1 = f(#"ab")+f(#"cde")+f(#"fg") for the above example
-            double value1 = (double) 0.0;
-            int end = 0;
-            int start = end;
-            while(start<myTarget.length) {
-                // System.out.write(myTarget[end]);
-                end++;;
-                while(partition[end] == false) {
-                    // System.out.write(myTarget[end]);
-                    end++;
-                }
-                // System.out.print("("+start+","+end+")");
-                int freq = myFrequencer.subByteFrequency(start, end);
-                if(freq == 0){
-                    value1 = Double.MAX_VALUE;
-                    break;
-                }
-                if(freq < 0) return (double) 0.0;
-                value1 = value1 + f(freq);
-		// it should  -->   value1 = value1 + f(myFrequencer.subByteFrequency(start, end)
-		// note that subByteFrequency is not work for B233367 version.
-                start = end;
-            }
-            // System.out.println(" "+ value1);
-
-            // Get the minimal value in "value"
-            if(value1 < value) value = value1;
-        }
-	if(debugMode) { System.out.printf("%10.5f\n", value); }
-        return value;
-    }
-
-    public double estimation2(){
-        // It returns Double.MAX_VALUE, when the true value is infinite, or space is not set.
-        if(myTarget == null || myTarget.length == 0) return 0.0;
-        if(mySpace == null) return Double.MAX_VALUE;
-
-        double[] values = new double[valueNum()];
+        double[] values = new double[valuesLength()];
         for(int i = 0; i < values.length; ++i) {
             values[i] = Double.MAX_VALUE;
         }
@@ -130,7 +72,7 @@ public class InformationEstimator implements InformationEstimatorInterface {
         return value;
     }
 
-    private int valueNum() {
+    private int valuesLength() {
         int n = 0;
         for(int i = 1; i <= myTarget.length; ++i) {
             n += i;
@@ -139,11 +81,30 @@ public class InformationEstimator implements InformationEstimatorInterface {
     }
 
     private double iq(int start, int end, double[] values) {
-        if(start == end) return 0.0;
+        if(end - start <= 0) return 0.0;
+
+        /*
+            DPのメモに利用するvaluesは、k*(k+1)/2のサイズ(k=target.length)
+            であり、下例のようにメモをする
+            例 : target = "abcd", start = 0, end = 4
+            values.length = 10
+            values[0] = "abcd"のiq
+            values[1] = "abc" のiq
+            values[2] = "bcd" のiq
+            values[3] = "ab"  のiq
+            values[4] = "bc"  のiq
+            values[5] = "cd"  のiq
+            values[6] = "a"   のiq
+            values[7] = "b"   のiq
+            values[8] = "c"   のiq
+            values[9] = "d"   のiq
+            このメモを実現するインデックスを求めるために以下の計算を行っている。
+        */
 
         int length = end - start;
         int l = myTarget.length - length;
         int index = l * (l + 1) / 2 + start;
+
         if(values[index] != Double.MAX_VALUE) return values[index];
 
         double minValue = Double.MAX_VALUE;
@@ -160,13 +121,7 @@ public class InformationEstimator implements InformationEstimatorInterface {
             if(value < minValue) minValue = value;
         }
         values[index] = minValue;
-/*
-for(int i = 0; i < values.length; ++i) {
-    if(values[i] == Double.MAX_VALUE) System.out.print("MAX ");
-    else System.out.printf("%.3f ", values[i]);
-}
-System.out.println();
-*/
+
         return minValue;
     }
 

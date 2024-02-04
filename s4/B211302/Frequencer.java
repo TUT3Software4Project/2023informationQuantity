@@ -50,55 +50,23 @@ public class Frequencer implements FrequencerInterface {
     public int frequency() {
         if(targetready == false) return -1;
         if(spacereday == false) return 0;
-        int targetLength = myTarget.length;
-        int spaceLength = mySpace.length;
-        int count = 0;
-    
-
-	    if(debugMode) { showVariables(); }
-        for(int start = 0; start<=spaceLength - targetLength; start++) { // Is it OK?
-            boolean abort = false;
-            for(int i = 0; i<targetLength; i++) {
-                if(myTarget[i] != mySpace[start+i]) { abort = true; break; }
-            }
-            if(abort == false) { count++; }
-        }
-	    if(debugMode) { System.out.printf("%10d\n", count); }
-
-        return count;
+        return subByteFrequency(0,myTarget.length);
     }
 
     // I know that here is a potential problem in the declaration.
     @Override
     public int subByteFrequency(int start, int length) {
         // Not yet implemented, but it should be defined as specified.
-        int targetLength = myTarget.length;
+	    
         int spaceLength = mySpace.length;
         int count = 0;
-        if(targetready == false) return -1;
-        if(spacereday == false) return 0;
-
-        if( start > length || start > spaceLength || length > spaceLength){
-            return -1;
-        }
-        
-        /*List<byte> list = new ArrayList<>();
-        for(int i=start; start<length; i++){
-            list.add(myTarget[i]);
-        }
-        byte[] subTarget =list.toArray(new byte[list.size()]);
-
-        if(debugMode) { showVariables(); }
-        for(int start1 = 0; start1<=spaceLength - targetLength; start1++) { // Is it OK?
-            boolean abort = false;
-            for(int i = 0; i<targetLength; i++) {
-                if(subTarget[i] != mySpace[start1+i]) { abort = true; break; }
-            }
-            if(abort == false) { count++; }
-        }
-	    if(debugMode) { System.out.printf("%10d\n", count); }
-        */
-
+	for(int offset = 0; offset<= spaceLength - (length - start); offset++) {
+	    boolean abort = false;
+	    for(int i = 0; i< (length - start); i++) {
+		if(myTarget[start+i] != mySpace[offset+i]) { abort = true; break; }
+	    }
+	    if(abort == false) { count++; }
+	}
         return count;
     }
 

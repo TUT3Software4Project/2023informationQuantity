@@ -51,10 +51,19 @@ public class Frequencer implements FrequencerInterface {
             for(int i = 0;i<space.length;i++) {
             suffixArray[i] = i;//suffixArrayの中身は0,1,2,3...space.length-1になる
             }
-	    //マージソート
-	    //suffixArray = msort(suffixArray);
+	
+	    //マージソート(なぜか並び順が逆になっている)
+	    suffixArray = msort(suffixArray);
+	    //順番を入れ替える用
+            int a;
+            for(int i = 0;i<(int)(suffixArray.length/2);i++){
+                a = suffixArray[i];
+                suffixArray[i] = suffixArray[suffixArray.length-i-1];
+		suffixArray[suffixArray.length-i-1] = a;
+	    }
+
 	    //辞書順になるようにバブルソート
-	    for(int r = 0;r<(space.length-1);r++){
+	    /*for(int r = 0;r<(space.length-1);r++){
    	         for(int i = (space.length-1);i>r;i--){
 			if(suffixCompare(suffixArray[i],suffixArray[i-1]) == -1){
 				int a = suffixArray[i];
@@ -62,7 +71,7 @@ public class Frequencer implements FrequencerInterface {
 				suffixArray[i-1] = a;
 			}
 		}
-	    }
+	    }*/
 	}
     }
     private int suffixCompare(int i, int j) {
@@ -109,33 +118,69 @@ public class Frequencer implements FrequencerInterface {
 	return 0;
     }
 
-    /*private int[] msort(suffixArray){
-	if(suffixArray.length==1){
-		return suffixArray;
-	}
-	
+    private int[] msort(int[] suffixArray){
+	int[] a;
+	int[] b;
 	if(suffixArray.length % 2 == 0){
 	    if(suffixArray.length==2){
 		if(suffixCompare(suffixArray[0],suffixArray[1]) == -1){//辞書順に入れ替え
-			x = suffixArray[0];
-			uffixArray[0] = suffixArray[1];
-			y = x;
+			int x = suffixArray[0];
+			suffixArray[0] = suffixArray[1];
+			suffixArray[1] = x;
 		}
 		return suffixArray;
 	    }
-            int[] a = msort(suffixArray.slice(0,(suffixArray.length / 2)));
-            int[] b = msort(suffixArray.slice(suffixArray.length / 2),suffixArray.length);
+            //a = msort(suffixArray.slice(0,(suffixArray.length / 2)));
+	    //b = msort(suffixArray.slice(suffixArray.length / 2),suffixArray.length);
+	    a = msort(slice(suffixArray,0,(int)(suffixArray.length / 2)));
+            b = msort(slice(suffixArray,(int)(suffixArray.length / 2),suffixArray.length));
 	}else{
 	    if(suffixArray.length==1){
 		return suffixArray;
 	    }
-	    int[] a = msort(suffixArray.slice(0,(suffixArray.length / 2)));
-            int[] b = msort(suffixArray.slice(suffixArray.length / 2),suffixArray.length);
+	    //a = msort(suffixArray.slice(0,(suffixArray.length / 2)));
+            //b = msort(suffixArray.slice(suffixArray.length / 2),suffixArray.length);
+	    a = msort(slice(suffixArray,0,(int)(suffixArray.length / 2)));
+            b = msort(slice(suffixArray,(int)(suffixArray.length / 2),suffixArray.length));
 	}
 
 	//配列aとbを辞書順にマージしリターン
+	int aLength = a.length;
+	int bLength = b.length;
+	int[] ret = new int[aLength+bLength];
+        int ac = 0;
+	int bc = 0;
 
-    }*/
+	while((ac < aLength) && (bc < bLength)){
+	    if(suffixCompare(a[ac],b[bc]) == -1){
+                ret[ac+bc] = b[bc];
+	        bc++;
+	    }else{
+                ret[ac+bc] = a[ac];
+	        ac++;
+	    }
+	}
+        if((ac < aLength)){
+            for(int i = ac;i<aLength;i++){
+		ret[i+bc] = a[i];
+	    }
+	}
+	if((bc < bLength)){
+            for(int j = bc;j<bLength;j++){
+		ret[ac+j] = b[j];
+	    }
+	}
+
+	return ret;
+    }
+
+     private int[] slice(int[] suffixArray,int x,int y){
+	int[] array = new int[y-x];
+        for(int i=0;i<(y-x);i++){
+            array[i] = suffixArray[i+x];
+	}
+        return array;
+     }
 	
     private void showVariables() {
 	for(int i=0; i< mySpace.length; i++) { System.out.write(mySpace[i]); }
@@ -407,7 +452,7 @@ public class Frequencer implements FrequencerInterface {
             System.out.println("Exception occurred: STOP8");
         }
 	    
-	/*myObject = new Frequencer();
+	myObject = new Frequencer();
         myObject.setSpace("ABC".getBytes());
         myObject.printSuffixArray();
         myObject = new Frequencer();
@@ -418,6 +463,6 @@ public class Frequencer implements FrequencerInterface {
         myObject.printSuffixArray();
         myObject = new Frequencer();
         myObject.setSpace("Hi Ho Hi Ho".getBytes());
-        myObject.printSuffixArray();*/
+        myObject.printSuffixArray();
     }
 }
