@@ -104,17 +104,39 @@ public void setSpace(byte []space) {
         //   suffixArray[ 1]= 1:BA
         //   suffixArray[ 2]= 0:CBA
         // のようになるべきである。
-	int i,j,baf;
-	for(i=0;i<space.length;i++)
-		for(j=i+1;j<space.length;j++){
-			if(suffixCompare(suffixArray[i],suffixArray[j]) == 1){
-				baf = suffixArray[i];
-				suffixArray[i] = suffixArray[j];
-				suffixArray[j] = baf;
-			}
+	mergeSort(suffixArray);
     }}
+    public static void mergeSort(int[] arr) {
+        if (arr.length <= 1)
+            return;
 
+        int mid = arr.length / 2;
+        int[] leftHalf = new int[mid];
+        int[] rightHalf = new int[arr.length - mid];
 
+        System.arraycopy(arr, 0, leftHalf, 0, mid);
+        System.arraycopy(arr, mid, rightHalf, 0, arr.length - mid);
+
+        mergeSort(leftHalf);
+        mergeSort(rightHalf);
+
+        merge(arr, leftHalf, rightHalf);
+    }
+
+    private static void merge(int[] arr, int[] left, int[] right) {
+        int i = 0, j = 0, k = 0;
+        while (i < left.length && j < right.length) {
+            if (suffixcompare(left[i],right[j]) == 1)
+                arr[k++] = left[i++];
+            else 
+                arr[k++] = right[j++];
+        }
+
+        while (i < left.length) 
+            arr[k++] = left[i++];
+        while (j < right.length) 
+            arr[k++] = right[j++];
+    }
     private void showVariables() {
 	for(int i=0; i< mySpace.length; i++) { System.out.write(mySpace[i]); }
 	System.out.write(' ');

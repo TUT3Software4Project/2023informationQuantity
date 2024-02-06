@@ -47,13 +47,17 @@ public class InformationEstimator implements InformationEstimatorInterface {
 
     @Override
     public void setTarget(byte[] target) {
-        myTarget = target; if(myTarget.length > 0) targetReady = true;
+        myTarget = target; 
+	if(myTarget.length > 0) 
+		targetReady = true;
     }
 
     @Override
     public void setSpace(byte[] space) {
         myFrequencer = new Frequencer();
-        mySpace = space; if(mySpace.length > 0)spaceReady = true;myFrequencer.setSpace(space);
+        mySpace = space;
+	spaceReady = true;
+	myFrequencer.setSpace(space);
     }
 
     @Override
@@ -73,7 +77,7 @@ public class InformationEstimator implements InformationEstimatorInterface {
             // for partition {"ab" "cde" "fg"}
             // a b c d e f g   : myTarget
             // T F T F F T F T : partition:
-            partition[0] = true; // I know that this is not needed, but..
+            partition[0] = true; 
             for(int i=0; i<myTarget.length -1;i++) {
                 partition[i+1] = (0 !=((1<<i) & p));
             }
@@ -94,8 +98,12 @@ public class InformationEstimator implements InformationEstimatorInterface {
                 // System.out.print("("+start+","+end+")");
                 myFrequencer.setTarget(subBytes(myTarget, start, end));
 		int freq = myFrequencer.frequency();
-		if(freq == 0) break;
-		if(freq < 0) return (double) 0.0;
+		if(freq == 0){ 
+			value1 = Double.MAX_VALUE;
+			break;
+		}
+		if(freq < 0) 
+			return (double) 0.0;
 		value1 = value1 + f(freq);
                 start = end;
             }
