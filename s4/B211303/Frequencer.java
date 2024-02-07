@@ -104,16 +104,39 @@ public void setSpace(byte []space) {
         //   suffixArray[ 1]= 1:BA
         //   suffixArray[ 2]= 0:CBA
         // のようになるべきである。
-	int i,j,baf;
-	for(i=0;i<space.length;i++)
-		for(j=i+1;j<space.length;j++){
-			if(suffixCompare(suffixArray[i],suffixArray[j]) == 1){
-				baf = suffixArray[i];
-				suffixArray[i] = suffixArray[j];
-				suffixArray[j] = baf;
-			}
-    }}
+	mergeSort(suffixArray);
+    }
+        private void mergeSort(int[] arr) {
+        if (arr.length <= 1)
+            return;
 
+        int mid = arr.length / 2;
+        int[] leftHalf = new int[mid];
+        int[] rightHalf = new int[arr.length - mid];
+
+        System.arraycopy(arr, 0, leftHalf, 0, mid);
+        System.arraycopy(arr, mid, rightHalf, 0, arr.length - mid);
+
+        mergeSort(leftHalf);
+        mergeSort(rightHalf);
+
+        merge(arr, leftHalf, rightHalf);
+    }
+
+    private void merge(int[] arr, int[] left, int[] right) {
+        int i = 0, j = 0, k = 0;
+        while (i < left.length && j < right.length) {
+            if (suffixCompare(left[i],right[j]) < 1)
+                arr[k++] = left[i++];
+            else 
+                arr[k++] = right[j++];
+        }
+
+        while (i < left.length) 
+            arr[k++] = left[i++];
+        while (j < right.length) 
+            arr[k++] = right[j++];
+    }
     private void showVariables() {
 	for(int i=0; i< mySpace.length; i++) { System.out.write(mySpace[i]); }
 	System.out.write(' ');
@@ -235,11 +258,14 @@ private int subByteStartIndex(int start, int end) {
         // Assuming the suffix array is created from "Hi Ho Hi Ho",                 
         // if target_start_end is "Ho ", it will return 6.                                                            
         //                                      
-	int i;
-	for(i = 0;i < mySpace.length;i++){
-		if(targetCompare(suffixArray[i],start,end) >= 0)
-			return i;
-	}return mySpace.length; 
+        int left = 0,right = suffixArray.length - 1,mid = 0;
+        while (left <= right) {
+            mid = left + (right - left) / 2;
+            if (targetCompare(suffixArray[mid],start,end) < 0)
+                left = mid + 1;
+	    else
+                right = mid - 1; 
+	}return mid;
     }
 private int subByteEndIndex(int start, int end) {
         //suffix arrayのなかで、目的の文字列の出現しなくなる場所を求めるメソッド
@@ -268,11 +294,14 @@ private int subByteEndIndex(int start, int end) {
         // Assuming the suffix array is created from "Hi Ho Hi Ho",          
         // if target_start_end is"i", it will return 9 for "Hi Ho Hi Ho".    
         //                                                                     
-	int i;
-	for(i = mySpace.length - 1;i >= 0;i--){
-		if(targetCompare(suffixArray[i],start,end) <= 0)
-			return i + 1;
-	}return 0; 
+        int left = 0,right = suffixArray.length - 1,mid = 0;
+        while (left <= right) {
+            mid = left + (right - left) / 2;
+            if (targetCompare(suffixArray[mid],start,end) > 0)
+                right = mid - 1;
+	    else
+                left = mid + 1; 
+	}return mid; 
     }
     public static void main(String[] args) {
         Frequencer frequencerObject;

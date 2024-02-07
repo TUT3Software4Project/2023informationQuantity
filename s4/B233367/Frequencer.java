@@ -115,10 +115,6 @@ public class Frequencer implements FrequencerInterface{
         //   suffixArray[ 2]= 0:CBA
         // のようになるべきである。
 
-        suffixSort();
-    }
-
-    private void suffixSort() {
         mergeSort(0, suffixArray.length - 1);
     }
 
@@ -239,7 +235,7 @@ public class Frequencer implements FrequencerInterface{
         }
 
         if(suffixLength < targetLength) return -1;
-        return 0; // この行は変更しなければいけない。 
+        return 0;
     }
 
 

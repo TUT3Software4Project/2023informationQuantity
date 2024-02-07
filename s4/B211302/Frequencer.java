@@ -1,88 +1,135 @@
-package s4.B211302; // Please modify to s4.Bnnnnnn, where nnnnnn is your student ID. 
+package s4.B211302;
 import java.lang.*;
 import s4.specification.*;
-
-/*
-interface FrequencerInterface {  // This interface provides the design for frequency counter.
-    void setTarget(byte[] target);  // set the data to search.
-    void setSpace(byte[] space);  // set the data to be searched target from.
-    int frequency(); // It return -1, when TARGET is not set or TARGET's length is zero
-                     // Otherwise, it return 0, when SPACE is not set or Space's length is zero
-                     // Otherwise, get the frequency of TAGET in SPACE
-    int subByteFrequency(int start, int end);
-    // get the frequency of subByte of taget, i.e. target[start], taget[start+1], ... , target[end-1].
-    // For the incorrect value of START or END, the behavior is undefined.
-}
-*/
+import java.util.*;
 
 
-public class Frequencer implements FrequencerInterface {
-    // Code to Test, *warning: This code contains intentional problem*
-    static boolean debugMode = false;
-    byte[] myTarget;
-    byte[] mySpace;
-    boolean targetready = false;
-    boolean spacereday = false;
+public class Frequencer implements FrequencerInterface{
+    
+    byte [] myTarget;
+    byte [] mySpace;
+    boolean targetReady = false;
+    boolean spaceReady = false;
 
-    @Override
-    public void setTarget(byte[] target) {
-        if(target.length > 0){
-            myTarget = target;
-            targetready = true;
-        }
-    }
-    @Override
-    public void setSpace(byte[] space) {
-        if(space.length > 0){
-            mySpace = space;
-            spacereday = true;
+    int []  suffixArray; 
+
+    private void printSuffixArray() {
+        if(spaceReady) {
+            for(int i=0; i< mySpace.length; i++) {
+                int s = suffixArray[i];
+                System.out.printf("suffixArray[%2d]=%2d:", i, s);
+                for(int j=s;j<mySpace.length;j++) {
+                    System.out.write(mySpace[j]);
+                }
+                System.out.write('\n');
+            }
         }
     }
 
-    private void showVariables() {
-	for(int i=0; i< mySpace.length; i++) { System.out.write(mySpace[i]); }
-	System.out.write(' ');
-	for(int i=0; i< myTarget.length; i++) { System.out.write(myTarget[i]); }
-	System.out.write(' ');
+    private int suffixCompare(int i, int j) {
+        String str1 = Arrays.toString(mySpace);
+        String suffix_i = str1.substring(i,str1.length()-1);
+        String suffix_j = str1.substring(j,str1.length()-1);
+        if (suffix_i.compareTo(suffix_j) < 0) return 1;
+        if (suffix_i.compareTo(suffix_j) > 0) return -1;
+        return 0;
     }
 
-    @Override
+    public void setSpace(byte []space) {
+        
+        mySpace = space; if(mySpace.length>0) spaceReady = true;
+       
+        suffixArray = new int[space.length];
+        
+        for(int i = 0; i< space.length; i++) {
+            suffixArray[i] = i; 
+        }
+
+        int tmp;
+        String str1 = Arrays.toString(mySpace);
+        for(int i=0;i<mySpace.length-1;i++){
+            for(int j=i+1;j<mySpace.length-1;j++){
+                String mySpace_i = str1.substring(i,str1.length()-1);
+                String mySpace_j = str1.substring(j,str1.length()-1);
+                if(mySpace_i.compareTo(mySpace_j) > 0){
+                    tmp = suffixArray[i];
+                    suffixArray[i] = suffixArray[j];
+                    suffixArray[j] = tmp;
+                }
+            }
+        }
+    }
+
+    public void setTarget(byte [] target) {
+        myTarget = target; if(myTarget.length>0) targetReady = true;
+    }
+
     public int frequency() {
-        if(targetready == false) return -1;
-        if(spacereday == false) return 0;
-        return subByteFrequency(0,myTarget.length);
+        if(targetReady == false) return -1;
+        if(spaceReady == false) return 0;
+        return subByteFrequency(0, myTarget.length);
     }
 
-    // I know that here is a potential problem in the declaration.
-    @Override
-    public int subByteFrequency(int start, int length) {
-        // Not yet implemented, but it should be defined as specified.
-	    
-        int spaceLength = mySpace.length;
-        int count = 0;
-	for(int offset = 0; offset<= spaceLength - (length - start); offset++) {
-	    boolean abort = false;
-	    for(int i = 0; i< (length - start); i++) {
-		if(myTarget[start+i] != mySpace[offset+i]) { abort = true; break; }
-	    }
-	    if(abort == false) { count++; }
-	}
-        return count;
+    public int subByteFrequency(int start, int end) {
+        int first = subByteStartIndex(start, end);
+        int last1 = subByteEndIndex(start, end);
+        return last1 - first;
+    }
+
+    private int targetCompare(int i, int j, int k) {
+        String str1 = Arrays.toString(mySpace);
+        String str2 = Arrays.toString(myTarget);
+        String suffix_i = str1.substring(i,str1.length()-1);
+        String target_j_k = str2.substring(j,k);
+        if (suffix_i.compareTo(target_j_k) < 0) return 1;
+        if (suffix_i.compareTo(target_j_k) > 0) return -1;
+        return 0;
+    }
+
+
+    private int subByteStartIndex(int start, int end) {;
+        String str1 = Arrays.toString(mySpace);
+        String str2 = Arrays.toString(myTarget);
+        String target_start_end = str2.substring(start,end);
+
+        int result = str1.indexOf(target_start_end);
+        return result;
+    }
+
+    private int subByteEndIndex(int start, int end) {
+                String str1 = Arrays.toString(mySpace);
+        String str2 = Arrays.toString(myTarget);
+        String target_start_end = str2.substring(start,end);
+
+        int result = str1.lastIndexOf(target_start_end);
+        return result;
+
     }
 
     public static void main(String[] args) {
-        Frequencer myObject;
-        int freq;
-	// White box test, here.
-	debugMode = true;
+        Frequencer frequencerObject;
         try {
-            myObject = new Frequencer();
-            myObject.setSpace("Hi Ho Hi Ho".getBytes());
-            myObject.setTarget("H".getBytes());
-            freq = myObject.frequency();
+            frequencerObject = new Frequencer();
+            frequencerObject.setSpace("ABC".getBytes());
+            frequencerObject.printSuffixArray();
+            frequencerObject = new Frequencer();
+            frequencerObject.setSpace("CBA".getBytes());
+            frequencerObject.printSuffixArray();
+            frequencerObject = new Frequencer();
+            frequencerObject.setSpace("HHH".getBytes());
+            frequencerObject.printSuffixArray();
+            frequencerObject = new Frequencer();
+            frequencerObject.setSpace("Hi Ho Hi Ho".getBytes());
+            frequencerObject.printSuffixArray();
+        
+            frequencerObject.setTarget("H".getBytes());
+        
+            int result = frequencerObject.frequency();
+            System.out.print("Freq = "+ result+" ");
+            if(4 == result) { System.out.println("OK"); } else {System.out.println("WRONG"); }
         }
         catch(Exception e) {
-            System.out.println("Exception occurred: STOP");
+            System.out.println("STOP");
         }
     }
 }
