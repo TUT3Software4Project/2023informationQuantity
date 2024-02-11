@@ -28,6 +28,7 @@ public class Frequencer implements FrequencerInterface{
     boolean spaceReady = false;
 
     int []  suffixArray; // Suffix Arrayの実装に使うデータの型をint []とせよ。
+    int []  tempArray;
 
     Random rand;
 
@@ -94,18 +95,49 @@ public class Frequencer implements FrequencerInterface{
 	this.suffixArray[index2] = temp;
     }
 	
-    //n^2の素朴なソート (left-right)が小さいとき用
-    private void simpleSortSuffixArray(int left, int right) {
-	for (int i=left; i < right; ++i)
+    private void mergeSortSuffixArray(int left, int right) {
+	//sizeが2なら単純に比較
+	int size = right - left;
+	if (size <= 2)
 	{
-	    for (int j=left+1; j < right; ++j)
+	    if (suffixCompare(this.suffixArray[left], this.suffixArray[left + 1]) == 1) { swapSuffixArray(left, left + 1); }
+	    return;
+	}
+
+	//分割
+	mergeSortSuffixArray(left, left + size / 2);
+	mergeSortSuffixArray(left + size / 2, right);
+
+	//マージ
+	int i = left;
+	int j = left + size / 2;
+	int k = left;
+	while (true)
+	{
+	    if (suffixCompare(this.suffixArray[i], this.suffixArray[j]) == 1)
 	    {
-		if (suffixCompare(suffixArray[i], suffixArray[j]) == 1)
+		this.tempArray[k] = this.suffixArray[j];
+	        ++k;
+		++j;
+		if (j == right)
 		{
-		    swapSuffixArray(i, j);
+		    for (; k < right; ++i, ++k) { this.tempArray[k] = this.suffixArray[i]; }
+		    break;
+		}
+	    }
+	    else
+	    {
+		this.tempArray[k] = this.suffixArray[i];
+	        ++k;
+		++i;
+		if (i == left + size / 2)
+		{
+		    for (; k < right; ++j, ++k) { this.tempArray[k] = this.suffixArray[j]; }
+		    break;
 		}
 	    }
 	}
+	for (i = left; i < right; ++i) { this.suffixArray[i] = this.tempArray[i]; }
     }
 	    
     private void quickSortSuffixArray(int left, int right) {
@@ -177,7 +209,8 @@ public class Frequencer implements FrequencerInterface{
 	if (this.mySpace.length < 2) { return; }
 	
 	rand = new Random();
-	quickSortSuffixArray(0, this.mySpace.length);
+	this.tempArray = new int[suffixArray.length];
+	mergeSortSuffixArray(0, this.mySpace.length);
     }
 
     // ここから始まり、指定する範囲までは変更してはならないコードである。

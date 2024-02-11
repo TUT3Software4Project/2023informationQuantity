@@ -28,6 +28,7 @@ public class Frequencer implements FrequencerInterface{
     boolean spaceReady = false;
 
     int []  suffixArray; // Suffix Arrayの実装に使うデータの型をint []とせよ。
+    int[] merger; // mergeソートに使う
 
     Random rand = new Random();
 
@@ -128,48 +129,39 @@ public class Frequencer implements FrequencerInterface{
         // のようになるべきである。
         // 
         // TODO:QUICK SORTを実装
-        suffixArrayQuickSort(0, suffixArray.length);
+        // suffixArrayQuickSort(0, suffixArray.length);
+        // TODO:MERGE SORTを実装
+        merger = new int[suffixArray.length];
+        mergeSort(0, suffixArray.length);
     }
 
-    // suffix array内の部分配列をクイックソート
-    // begin <= index < end
-    private void suffixArrayQuickSort (int begin, int end) {
-        if (begin < end) {
-            int pivot = suffixArrayPartition(begin, end);
-            suffixArrayQuickSort(begin, pivot);
-            suffixArrayQuickSort(pivot + 1, end);
+    // merge sort
+    // l <= index < r
+    void mergeSort (int l, int r) {
+        if (l < r - 1) {
+            int m = (l + r) / 2;
+            mergeSort(l, m);
+            mergeSort(m, r);
+            merge(l, m, r);
         }
     }
-
-    // quick sortのパーティション
-    // begin <= index < end
-    // パーティション後pivotのindexをreturn
-    private int suffixArrayPartition (int begin, int end) {
-        // pivotの決定
-        int r = rand.nextInt(end - begin) + begin;
-        // rと部分配列の最終要素をswap
-        suffixArraySwap(r, end - 1);
-        int i = begin;
-        int pivot = suffixArray[end - 1];
-        for (int j = begin; j < end - 1; j++) {
-            // pivotとjを比較
-            int result = suffixCompare(suffixArray[j], pivot);
-            // pivot以下ならiの示すindexとswap
-            if (result <= 0) {
-                suffixArraySwap(i, j);
-                i++;
+    
+    // mergesortのマージ操作
+    void merge (int l, int m, int r) {
+        for (int i = l; i < r; i++) {
+            merger[i] = suffixArray[i];
+        }
+        int n1 = l;
+        int n2 = m;
+        for (int i = l; i < r; i++) {
+            if (n1 < m && (n2 >= r || suffixCompare(merger[n1], merger[n2]) <= 0)) {
+                suffixArray[i] = merger[n1];
+                n1++;
+            } else {
+                suffixArray[i] = merger[n2];
+                n2++;
             }
         }
-        // pivotを大小の境界に配置
-        suffixArraySwap(i, end - 1);
-        return i;
-    }
-
-    // suffix_array内のswap
-    private void suffixArraySwap (int i, int j) {
-        int temp = suffixArray[i];
-        suffixArray[i] = suffixArray[j];
-        suffixArray[j] = temp;
     }
 
     // ここから始まり、指定する範囲までは変更してはならないコードである。

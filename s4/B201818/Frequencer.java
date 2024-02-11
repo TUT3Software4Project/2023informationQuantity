@@ -243,12 +243,12 @@ public class Frequencer implements FrequencerInterface {
 	if(debugMode) { System.out.printf("%10d\n", count); }
         return count;*/
 
-	/*int first = subByteStartIndex(s, e);//いくつ目のサフィックスアレイから一致しているか
+	int first = subByteStartIndex(start, end);//いくつ目のサフィックスアレイから一致しているか
 	if(first == -1) return 0;
-        int last1 = subByteEndIndex(s, e, first);//いくつ目のサフィックスアレイから不一致になるか
-        return last1 - first;*/
+        int last1 = subByteEndIndex(start, end, first);//いくつ目のサフィックスアレイから不一致になるか
+        return last1 - first;
 
-        int sStart = 0;
+        /*int sStart = 0;
 	int sEnd = mySpace.length;//suffixarray上の探す領域
 	for (int n = 0; n < (end - start); n++){
             //n文字目が一致する場所を探索していく、だんだん領域が狭まっていく
@@ -257,11 +257,11 @@ public class Frequencer implements FrequencerInterface {
 	    sEnd = endSearch(start,end,sStart,sEnd,n);
 	}
 
-        return (sEnd - sStart);
+        return (sEnd - sStart);*/
 	    
     }
 
-private int startSearch(int start, int end, int sStart, int sEnd,int n){
+/*private int startSearch(int start, int end, int sStart, int sEnd,int n){
         if(sStart == 0 && sEnd == 1){
 	    //suffixArray[0]が一致する場合はここで判定する
             if((suffixArray[0] + (end-start)) <= mySpace.length){//文字数を超過していなければ
@@ -321,9 +321,9 @@ private int endSearch(int start, int end, int sStart, int sEnd,int n){
 	}
     }
     return -1;
-}
+}*/
 
-    /*private int subByteStartIndex(int start, int end) {
+    private int subByteStartIndex(int start, int end) {
 	//suffix arrayのなかで、目的の文字列の出現が始まる位置を求めるメソッド
         // 以下のように定義せよ。
         // The meaning of start and end is the same as subByteFrequency.
@@ -351,7 +351,7 @@ private int endSearch(int start, int end, int sStart, int sEnd,int n){
         // Assuming the suffix array is created from "Hi Ho Hi Ho",                 
         // if target_start_end is "Ho ", it will return 6. 
 	    
-	/*int i,j;
+	int i,j;
 	for (i = 0;i<mySpace.length;i++){
 	    boolean abort = false;
             if((suffixArray[i] + (end-start)) <= mySpace.length){//文字数を超過していれば
@@ -365,9 +365,9 @@ private int endSearch(int start, int end, int sStart, int sEnd,int n){
         }
 	    
         return -1;
-    }*/
+    }
 
-    /*private int subByteEndIndex(int start, int end, int first) {
+    private int subByteEndIndex(int start, int end, int first) {
         //suffix arrayのなかで、目的の文字列の出現しなくなる場所を求めるメソッド
         // 以下のように定義せよ。
         // The meaning of start and end is the same as subByteFrequency.
@@ -382,8 +382,9 @@ private int endSearch(int start, int end, int sStart, int sEnd,int n){
            7:i Ho                                    
            8:i Ho Hi Ho                              
            9:o                                       
-          10:o Hi Ho                                 
-        */
+          10:o Hi Ho                                
+	*/
+        
         // It returns the index of the first suffix 
         // which is greater than target_start_end; (and not equal to target_start_end)
 	// Suppose target is set "High_and_Low",
@@ -396,7 +397,7 @@ private int endSearch(int start, int end, int sStart, int sEnd,int n){
         //                                                                   
 	    
 	//カウントが進んだ状態からスタート
-	/*int i,j;
+	int i,j;
 	for (i = first;i<mySpace.length;i++){
 	    boolean abort = true;
             if((suffixArray[i] + (end-start)) > mySpace.length){return i;}//文字数を超過していれば
@@ -409,7 +410,7 @@ private int endSearch(int start, int end, int sStart, int sEnd,int n){
             }
 	if(i == mySpace.length) return i;//ターゲット文字数が1かつ最後のアレイまで一致していてfor文を超過した場合
         return -1;
-    }*/
+    }
 
     public static void main(String[] args) {
         Frequencer myObject;
@@ -510,7 +511,7 @@ private int endSearch(int start, int end, int sStart, int sEnd,int n){
             System.out.println("Exception occurred: STOP8");
         }
 	    
-	myObject = new Frequencer();
+	/*myObject = new Frequencer();
         myObject.setSpace("ABC".getBytes());
         myObject.printSuffixArray();
         myObject = new Frequencer();
@@ -521,6 +522,6 @@ private int endSearch(int start, int end, int sStart, int sEnd,int n){
         myObject.printSuffixArray();
         myObject = new Frequencer();
         myObject.setSpace("Hi Ho Hi Ho".getBytes());
-        myObject.printSuffixArray();
+        myObject.printSuffixArray();*/
     }
 }
